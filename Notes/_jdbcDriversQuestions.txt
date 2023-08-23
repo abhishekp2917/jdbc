@@ -1,0 +1,135 @@
+*   What is driver software in JDBC ?
+
+>>  A group of implementation classes of JDBC interface is called driver software which is identified by Driver class (class which provide
+    implementation of driver interface).
+
+________________________________________________________________________________________________________________________
+
+*   How many types of drivers are there ?
+
+>>  Based on functionality and architecture, all the drivers are classified into 4 types.
+
+    (1) Type-1 Driver :
+
+        also known as
+
+        - JDBC-ODBC Bridge Driver or
+        - Bridge Driver
+
+    (2) Type-2 Driver :
+
+        also known as
+
+        - Native API - Partly Java Driver or
+        - Native Driver
+
+    (3) Type-3 Driver :
+
+        also known as
+
+        - All Java Net Protocol Driver or
+        - Network Protocol Driver or
+        - Middleware Driver
+
+    (4) Type-4 Driver :
+
+        also known as
+
+        - All Java Native Protocol Driver or
+        - Pure java Driver
+        - Thin Driver
+
+________________________________________________________________________________________________________________________
+
+*   Explain Type-1 Driver.
+
+>>  Type-1 driver converts JDBC calls into ODBC calls and vice versa. It acts as a bridge between Java application and
+    ODBC. That's why it's also known as JDBC-ODBC bridge driver or bridge driver.
+
+    It doesn't communicate directly with database. Instead, it takes support of ODBC to communicate with DB.
+
+    It is not recommended to use this Driver.
+
+        JAVA Appication   ===>   Type-1 Driver   ===>   ODBC Driver   ===>   Database
+                                       or
+                                  Bridge Driver
+
+    Pros :
+
+    (1) We are not required to install it seperately as it is available as the part of JDK
+    (2) As it doesn't communicate directly with DB, it is DB independent Driver
+
+    Cons :
+
+    (1) It is slowest Driver as first it converts JDBC calls to ODBC calls and then ODBC will convert it to DB specific
+        calls.
+    (2) As it uses ODBC which only supports Windows platform, this Driver is platform dependent Driver
+
+________________________________________________________________________________________________________________________
+
+*   Explain Type-2 Driver.
+
+>>  Type-2 Driver is similar to Type-1 Driver execpt there is only change i.e. ODBC Driver is replaced with Vendor
+    provided database specific native languages mostly in C or C++. Due to which we have to install this library into
+    client machine.
+
+    Type-2 Driver converts JDBC calls to vendor specific database native library calls which can be understood by
+    database.
+
+    JAVA Appication   ===>   Type-2 Driver   ===>   Database vendor specific   ===>   Database
+                                    or                  native libraries
+                             Native Driver
+
+    Pros :
+
+    (1) There is no need of ODBC Driver
+    (2) It is applicable to multiple platform as there is no ODBC Driver required.
+
+    Cons :
+
+    (1) It is platform dependent driver. On the change of platform, we have to change the Driver.
+    (2) It is database dependent driver. On the change of database, we have to change the Driver.
+
+________________________________________________________________________________________________________________________
+
+*   Explain Type-3 Driver.
+
+>>  Type -3 Driver JDBC is also known as Network Protocol Driver as it uses an application server that converts JDBC
+    calls directly or indirectly into the vendor-specific database protocol.
+
+    This driver translates JDBC calls into the middleware vendor’s protocol, which is then converted to a
+    database-specific protocol by the middleware server software that provides connectivity to many databases.
+
+    JAVA Appication   ===>          Type-3 Driver        ===>    Middleware server  ===>   Database
+                                       or
+                                Network Protocol Driver
+
+    Pros :
+
+    (1) It is platform independent
+    (2) It is database independent as middleware server will communicate with the database
+
+    Cons :
+
+    (1) It needs database specific code on middleware server
+
+________________________________________________________________________________________________________________________
+
+*   Explain Type-4 Driver.
+
+>>  This Driver uses Database specific native protocols to communicate with the database.
+
+    It converts JDBC calls to database specific calls directly which makes it faster than other Drivers.
+
+    JAVA Appication   ===>   Type-4 Driver    ===>   Database
+                                    or
+                            Pure java Driver
+
+    Pros :
+
+    (1) It is platform independent Driver.
+    (2) It uses database specific native protocols to communicate with the database hence security is more.
+
+    Cons :
+
+    (1) It is database dependent driver. On the change of database, we have to change the Driver.

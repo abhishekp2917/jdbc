@@ -1,0 +1,94 @@
+*   What is JDBC ?
+
+>>  JDBC stands for "Java Database Connectivity." It is a Java-based technology that provides a standard interface for
+    connecting Java applications with databases. JDBC enables Java applications to interact with various types of
+    databases using a consistent and platform-independent API (Application Programming Interface).
+
+    With JDBC, developers can write Java code to perform database operations such as querying data, updating records,
+    inserting data, and more, regardless of the specific database system being used (such as MySQL, Oracle, PostgreSQL,
+    etc.). This abstraction layer provided by JDBC allows developers to switch between different databases without
+    having to rewrite significant portions of their code.
+
+________________________________________________________________________________________________________________________
+
+*   What are the basic components of JDBC ?
+
+>>  Following are the components of JDBC :
+
+    (1) JDBC Drivers: JDBC drivers are platform-specific implementations that bridge the gap between the Java application
+        and the underlying database. It is translator that translate JAVA calls into DB specific calls and vice-versa.
+
+        There are four types of JDBC drivers: Type 1 (JDBC-ODBC bridge), Type 2 (Native-API),
+        Type 3 (Network Protocol), and Type 4 (Thin driver).
+
+    (2) Connection: A connection is established between the Java application and the database using the JDBC driver. It
+        provides methods to interact with the database, such as executing queries and updates.
+
+    (3) Statement: A statement is an interface used to execute SQL queries against the database. It is used to send sql
+        queries to DB and brng the result.
+
+        There are two main types of statements in JDBC: 'Statement' for basic queries and 'PreparedStatement' for
+        parameterized queries.
+
+    (4) ResultSet: A ResultSet represents the result of a query. It allows you to retrieve data from the database and
+        iterate over the rows returned by the query.
+
+________________________________________________________________________________________________________________________
+
+*   What are the steps to establish JDBC application ?
+
+>>  Following are the steps :
+
+    (1) Load and register driver
+
+    (2) Establish the connection between JAVA application and database
+
+    (3) Creation of statement object
+
+    (4) Send and execute SQL query
+
+    (5) Process result from result steps
+
+    (6) Close the connection
+
+________________________________________________________________________________________________________________________
+
+*   What is difference between JDBC and ODBC ?
+
+>>                  ODBC                                                    JDBC
+
+    ODBC stands for 'Open Database Connectivity'    |   JDBC stands for 'Java Database Connectivity'
+                                                    |
+    We can use ODBC for any language                |   We can use JDBC for only JAVA language
+                                                    |
+    We can use ODBC for only windows platform       |   We can use JDBC for any platform
+                                                    |
+________________________________________________________________________________________________________________________
+
+*   Explain the JDBC API packages.
+
+>>  JDBC API contains 2 package i.e. (1) java.sql and (2) javax.sql
+
+    'java.sql' package contains basic classes and interface which can be used for database communication.
+
+    Following are some examples of interfaces in 'java.sql' package :
+
+    (1) Driver
+    (2) Connection
+    (3) Statement
+    (4) PreparedStatement
+    (5) CallableStatement
+    (6) ResultSet
+
+    'javax.sql' package contains more advance classes and interface which can be used for database communication. It contains
+    multiple sub packages such as 'javax.sql.rowset', 'javax.sql.rowset.serial', 'javax.sql.spi' etc
+
+    Following are some examples of interfaces in 'javax.sql' package :
+
+    (1) DataSource
+    (2) RowSet
+    (3) RowSetListener
+    (4) ConnectionEventListener
+
+________________________________________________________________________________________________________________________
+
