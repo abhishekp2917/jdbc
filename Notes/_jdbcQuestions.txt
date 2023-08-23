@@ -80,8 +80,8 @@ ________________________________________________________________________________
     (5) CallableStatement
     (6) ResultSet
 
-    'javax.sql' package contains more advance classes and interface which can be used for database communication. It contains
-    multiple sub packages such as 'javax.sql.rowset', 'javax.sql.rowset.serial', 'javax.sql.spi' etc
+    'javax.sql' package contains more advance classes and interface which can be used for database communication. It
+    contains multiple sub packages such as 'javax.sql.rowset', 'javax.sql.rowset.serial', 'javax.sql.spi' etc
 
     Following are some examples of interfaces in 'javax.sql' package :
 
@@ -92,3 +92,83 @@ ________________________________________________________________________________
 
 ________________________________________________________________________________________________________________________
 
+*   Explain various 'execute' method in JDBC.
+
+>>  In JDBC, the execute methods are used to execute SQL queries and statements against a database.
+    These methods are available in the Statement and PreparedStatement interfaces, both of which are used to interact
+    with the database. Here are some of the common execute methods along with examples:
+
+    (1) executeQuery:
+
+    This method is used to execute a SELECT query and retrieve the result set.
+
+    ```
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM employees");
+        while (resultSet.next()) {
+            // Process each row of the result set
+            String name = resultSet.getString("name");
+            double salary = resultSet.getDouble("salary");
+            System.out.println("Name: " + name + ", Salary: " + salary);
+        }
+    ```
+
+    (2) executeUpdate:
+
+    This method is used to execute INSERT, UPDATE, DELETE, and other DML (Data Manipulation Language) statements that do
+    not return a result set. It returns the number of affected rows.
+
+    ```
+        Statement statement = connection.createStatement();
+        int rowsAffected = statement.executeUpdate("UPDATE employees SET salary = salary * 1.1 WHERE department = 'IT'");
+        System.out.println(rowsAffected + " rows updated");
+    ```
+
+    (3) execute:
+
+    This method is used to execute any SQL statement. It returns a boolean indicating whether the first result is a
+    result set or an update count.
+
+    ```
+        Statement statement = connection.createStatement();
+        boolean hasResultSet = statement.execute("INSERT INTO employees (name, salary) VALUES ('John', 50000)");
+        if (!hasResultSet) {
+            int rowsAffected = statement.getUpdateCount();
+            System.out.println(rowsAffected + " rows inserted");
+        }
+        else {
+            ResultSet resultSet = statement.getResultSet();
+            while (resultSet.next()) {
+                // Process each row of the result set
+                String name = resultSet.getString("name");
+                double salary = resultSet.getDouble("salary");
+                System.out.println("Name: " + name + ", Salary: " + salary);
+            }
+        }
+    ```
+
+    (4) executeBatch:
+
+    This method is used to execute a batch of SQL statements together. It can improve performance by reducing the number
+    of round-trips to the database.
+
+    ```
+        Statement statement = connection.createStatement();
+        statement.addBatch("INSERT INTO employees (name, salary) VALUES ('Alice', 60000)");
+        statement.addBatch("INSERT INTO employees (name, salary) VALUES ('Bob', 55000)");
+        int[] batchResults = statement.executeBatch();
+        for (int result : batchResults) {
+            System.out.println("Rows affected: " + result);
+        }
+    ```
+
+    (5) executeLargeUpdate:
+
+    This method is similar to executeUpdate, but it's intended for cases where the number of affected rows might be larger than an int.
+
+    ```
+        Statement statement = connection.createStatement();
+        long rowsAffected = statement.executeLargeUpdate("DELETE FROM employees WHERE salary < 40000");
+        System.out.println(rowsAffected + " rows deleted");
+    ```
+________________________________________________________________________________________________________________________
