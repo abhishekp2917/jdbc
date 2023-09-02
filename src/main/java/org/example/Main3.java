@@ -18,10 +18,11 @@ public class Main3 {
             System.out.println("1. Create a Table");
             System.out.println("2. Drop a Table");
             System.out.println("3. Insert into a Table");
-            System.out.println("4. Delete from a Table");
-            System.out.println("5. Select from a Table");
-            System.out.println("6. Manually enter a query");
-            System.out.println("7. Exit");
+            System.out.println("4. Update record of a Table");
+            System.out.println("5. Delete from a Table");
+            System.out.println("6. Select from a Table");
+            System.out.println("7. Manually enter a query");
+            System.out.println("8. Exit");
             System.out.println("_________________________________________________\n");
 
             int choice = sc.nextInt();
@@ -40,18 +41,22 @@ public class Main3 {
                     break;
                 }
                 case 4 : {
-                    delete();
+                    update();
                     break;
                 }
                 case 5 : {
-                    select();
+                    delete();
                     break;
                 }
                 case 6 : {
-                    executeQuery();
+                    select();
                     break;
                 }
                 case 7 : {
+                    executeQuery();
+                    break;
+                }
+                case 8 : {
                     exit = true;
                     break;
                 }
@@ -179,6 +184,50 @@ public class Main3 {
                     // committing the changes
                     connection.commit();
                     System.out.println(String.format("%d rows inserted into table '%s' successfully", rowsEffected, tableName.toLowerCase()));
+                }
+            }
+            catch (SQLSyntaxErrorException e) {
+                System.err.println("Incorrect SQL Syntax.");
+                e.printStackTrace();
+            }
+            catch (SQLException e) {
+                System.err.println("Connection to the database failed.");
+                e.printStackTrace();
+            }
+        }
+        else System.out.println("Table doesn't exists.");
+    }
+
+    public static void update() {
+        System.out.print("Enter table name whose record to be updated : ");
+        String tableName = sc.next();
+        HashMap<String, String> columnMap = getColumnList(tableName);
+        ArrayList<String> columnList = new ArrayList<>(columnMap.keySet());
+        if(columnList.size()>0) {
+            System.out.println("\n_________________________________________________");
+            System.out.println("Select column for update criteria : ");
+            for(int i=1; i<=columnList.size(); i++) {
+                System.out.println(String.format("%d. %s", i, columnList.get(i-1)));
+            }
+            System.out.println("_________________________________________________\n");
+            String selectedColumn = columnList.get(sc.nextInt()-1);
+            System.out.print(String.format("Enter value for column '%s': ", selectedColumn));
+            String selectedColumnValue = columnMap.get(selectedColumn).equalsIgnoreCase("VARCHAR")? String.format("'%s'", sc.next()) : sc.next();
+            System.out.println("\n_________________________________________________");
+            System.out.println("Select column whose value to be updated : ");
+            for(int i=1; i<=columnList.size(); i++) {
+                System.out.println(String.format("%d. %s", i, columnList.get(i-1)));
+            }
+            System.out.println("_________________________________________________\n");
+            String column = columnList.get(sc.nextInt()-1);
+            System.out.print(String.format("Enter new value for column '%s': ", column));
+            String columnValue = columnMap.get(column).equalsIgnoreCase("VARCHAR")? String.format("'%s'", sc.next()) : sc.next();
+            String sqlQuery = String.format("UPDATE %s SET %s=%s WHERE %s=%s", tableName.toLowerCase(), column.toLowerCase(), columnValue.toLowerCase(), selectedColumn.toLowerCase(), selectedColumnValue.toLowerCase());
+            System.out.println(String.format("SQL Query : %s", sqlQuery));
+            try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
+                try(Statement statement = connection.createStatement()) {
+                    int rowsEffected = statement.executeUpdate(sqlQuery);
+                    System.out.println(String.format("%d rows updated of table '%s' successfully", rowsEffected, tableName.toLowerCase()));
                 }
             }
             catch (SQLSyntaxErrorException e) {
