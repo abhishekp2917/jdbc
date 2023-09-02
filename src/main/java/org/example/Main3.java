@@ -171,8 +171,13 @@ public class Main3 {
             String sqlQuery = String.format("INSERT INTO %s (%s) VALUES %s", tableName.toLowerCase(), colNames.substring(0, colNames.length()-1), rows.substring(0, rows.length()-1));
             System.out.println(String.format("SQL Query : %s", sqlQuery));
             try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
+                // disabling auto commit due to which after executing any DML query using this connection,
+                // we must commit the changes else changes will not reflect in DB
+                connection.setAutoCommit(false);
                 try(Statement statement = connection.createStatement()) {
                     int rowsEffected = statement.executeUpdate(sqlQuery);
+                    // committing the changes
+                    connection.commit();
                     System.out.println(String.format("%d rows inserted into table '%s' successfully", rowsEffected, tableName.toLowerCase()));
                 }
             }
@@ -234,17 +239,7 @@ public class Main3 {
             try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
                 try(Statement statement = connection.createStatement()) {
                     ResultSet result = statement.executeQuery(sqlQuery);
-                    ResultSetMetaData metaData = result.getMetaData();
-                    int columnCount = metaData.getColumnCount();
-                    System.out.println("\n_________________________________________________");
-                    while(result.next()) {
-                        String record = "";
-                        for(int i=1; i<=columnCount; i++) {
-                            record += String.format("%s\t\t", result.getString(i));
-                        }
-                        System.out.println(record);
-                    }
-                    System.out.println("_________________________________________________\n");
+                    displayResultSet(result);
                 }
             }
             catch (SQLSyntaxErrorException e) {
@@ -267,17 +262,7 @@ public class Main3 {
             try(Statement statement = connection.createStatement()) {
                 if(statement.execute(sqlQuery)) {
                     ResultSet result = statement.executeQuery(sqlQuery);
-                    ResultSetMetaData metaData = result.getMetaData();
-                    int columnCount = metaData.getColumnCount();
-                    System.out.println("\n_________________________________________________");
-                    while(result.next()) {
-                        String record = "";
-                        for(int i=1; i<=columnCount; i++) {
-                            record += String.format("%s\t\t", result.getString(i));
-                        }
-                        System.out.println(record);
-                    }
-                    System.out.println("_________________________________________________\n");
+                    displayResultSet(result);
                 }
                 else {
                     int rowsEffected = statement.executeUpdate(sqlQuery);
@@ -312,6 +297,48 @@ public class Main3 {
             e.printStackTrace();
         }
         return columnsList;
+    }
+
+    private static void displayResultSet(ResultSet result) {
+        try{
+
+            // ResultSetMetaData hold meta data i.e. data about the data (result set) such as
+            // column count, column name of a specific index etc
+            ResultSetMetaData metaData = result.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            int[] columnMaxSize = new int[columnCount];
+            for(int i=1; i<=columnCount; i++) {
+                columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], metaData.getColumnName(i).length());
+            }
+            ArrayList<String[]> records = new ArrayList<>();
+            while(result.next()) {
+                String[] record = new String[columnCount];
+                for(int i=1; i<=columnCount; i++) {
+                    record[i-1] = result.getString(i);
+                    columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], record[i-1].length());
+                }
+                records.add(record);
+            }
+            System.out.println("\n_________________________________________________");
+            for(int i=1; i<=columnCount; i++) {
+                int desiredWidth = columnMaxSize[i-1];
+                String stringWithTrailingSpaces = String.format("%-" + desiredWidth + "s", metaData.getColumnName(i));
+                System.out.print(String.format("\t%s\t", stringWithTrailingSpaces));
+            }
+            System.out.println("\n_________________________________________________");
+            for(String[] record : records) {
+                for(int i=0; i<record.length; i++) {
+                    int desiredWidth = columnMaxSize[i];
+                    String stringWithTrailingSpaces = String.format("%-" + desiredWidth + "s", record[i]);
+                    System.out.print(String.format("\t%s\t", stringWithTrailingSpaces));
+                }
+                System.out.println();
+            }
+            System.out.println("_________________________________________________\n");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

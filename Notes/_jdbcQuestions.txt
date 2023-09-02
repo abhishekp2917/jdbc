@@ -195,3 +195,30 @@ ________________________________________________________________________________
 
 ________________________________________________________________________________________________________________________
 
+*   Do we need to explicitly commit the DML changes using JDBC ?
+
+>>  No, we don't need to explicitly commit the DML changes as JDBC will auto commit the changes.
+
+    If we disable the auto commit, then for a particular connection for which auto commit is disabled,
+    we have to commit the changes after executing the SQL query.
+
+    ```
+        // establishing a new connection
+        Connection connection = DriverManager.getConnection(jdbcUrl, username, password)
+
+        //  disabling auto commit due to which after executing any DML query using this connection,
+        //  we must commit the changes else changes will not reflect in DB
+        connection.setAutoCommit(false);
+
+        String sqlQuery = "DELETE FROM student WHERE id=1";
+        Statement statement = connection.createStatement()
+        int rowsEffected = statement.executeUpdate(sqlQuery);
+
+        // committing the changes so that data will be persistence
+        connection.commit();
+
+        // closing all the opened resources
+        statement.close();
+        connection.close();
+    ```
+________________________________________________________________________________________________________________________
