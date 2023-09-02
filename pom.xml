@@ -13,5 +13,34 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+
+        <!-- lombok -->
+        <!--
+            Project Lombok is a library that helps you reduce boilerplate code in your Java classes by providing
+            annotations to generate methods like getters, setters, constructors, and more. It works with your IDE to
+            generate the methods during compilation, saving you from writing repetitive code.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.28</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- MySQL Connector/J -->
+        <!--
+            This dependency provides the MySQL Connector/J driver.
+            It enables your Java application to connect to a MySQL database.
+            The driver is necessary to establish communication between your application and the MySQL database server.
+        -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.27</version>
+        </dependency>
+
+    </dependencies>
 
 </project>

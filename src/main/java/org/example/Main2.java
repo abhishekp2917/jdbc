@@ -2,8 +2,9 @@ package org.example;
 
 import java.sql.*;
 
-public class Main1 {
+public class Main2 {
     public static void main(String[] args) {
+
         // JDBC URL for MySQL
         String jdbcUrl = "jdbc:mysql://localhost:3306/temp";
         // credentials for connecting to MySQL
@@ -12,8 +13,6 @@ public class Main1 {
 
         try {
             // Load the MySQL JDBC driver
-            // we need to load the driver class explicitly because in our code we aren't using this class directly due
-            // to which while compiling, JVM will not load this class automatically which will raise an exception
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Establish the connection
@@ -21,19 +20,17 @@ public class Main1 {
 
             if (connection != null) {
 
-                String sql = "SELECT * FROM employee";
-                PreparedStatement statement = connection.prepareStatement(sql);
+                // SQL query to create a table
+                String sqlQuery = "CREATE TABLE student (Id INT PRIMARY KEY, Name VARCHAR(20), Age INT)";
 
-                ResultSet resultSet = statement.executeQuery();
+                // preparing statement
+                Statement statement = connection.createStatement();
 
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("employeeID");
-                    String name = resultSet.getString("name");
-                    double salary = resultSet.getDouble("salary");
-                    System.out.println("ID: " + id + ", Name: " + name + ", Salary: " + salary);
-                }
+                // executing 'NON SELECT' query using executeUpdate method
+                statement.executeUpdate(sqlQuery);
 
-                resultSet.close();
+                System.out.println("Student table created successfully");
+
                 statement.close();
                 connection.close();
             }

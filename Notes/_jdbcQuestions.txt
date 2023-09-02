@@ -164,7 +164,8 @@ ________________________________________________________________________________
 
     (5) executeLargeUpdate:
 
-    This method is similar to executeUpdate, but it's intended for cases where the number of affected rows might be larger than an int.
+    This method is similar to executeUpdate, but it's intended for cases where the number of affected rows might be
+    larger than an int.
 
     ```
         Statement statement = connection.createStatement();
@@ -172,3 +173,25 @@ ________________________________________________________________________________
         System.out.println(rowsAffected + " rows deleted");
     ```
 ________________________________________________________________________________________________________________________
+
+*   Explain what will happen if we use different execute method for running SQL query which they aren't meant for.
+
+>>  Given below are the scenarios and their outputs :
+
+    (1) Using 'executeQuery' for executing Non-Select query :
+
+        In case of Type-1 driver, we will get SQLException.
+        In case of Type-4 driver, we will get empty RowSet.
+
+    (2) Using 'executeUpdate' for executing Select query :
+
+        In case of Type-1 driver, we will get SQLException.
+        In case of Type-4 driver, we will get number of rows selected.
+
+    (3) Using 'executeUpdate' for executing Non DML query :
+
+        In case of Type-1 driver, we will get -1.
+        In case of Type-4 driver, we will get 0.
+
+________________________________________________________________________________________________________________________
+
