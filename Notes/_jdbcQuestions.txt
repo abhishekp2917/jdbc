@@ -181,7 +181,8 @@ ________________________________________________________________________________
     (1) Using 'executeQuery' for executing Non-Select query :
 
         In case of Type-1 driver, we will get SQLException.
-        In case of Type-4 driver, we will get empty RowSet.
+        In case of Type-4 driver, the Non-Query will be executed successfully and we will get empty ResultSet. But if
+        we try to use this ResultSet object, we will get SQLException.
 
     (2) Using 'executeUpdate' for executing Select query :
 

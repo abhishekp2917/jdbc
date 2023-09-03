@@ -22,7 +22,9 @@ public class Main3 {
             System.out.println("5. Delete from a Table");
             System.out.println("6. Select from a Table");
             System.out.println("7. Manually enter a query");
-            System.out.println("8. Exit");
+            System.out.println("8. Execute Select query");
+            System.out.println("9. Execute Non-Select query");
+            System.out.println("10. Exit");
             System.out.println("_________________________________________________\n");
 
             int choice = sc.nextInt();
@@ -57,6 +59,14 @@ public class Main3 {
                     break;
                 }
                 case 8 : {
+                    executeSelectQuery();
+                    break;
+                }
+                case 9 : {
+                    executeNonSelectQuery();
+                    break;
+                }
+                case 10 : {
                     exit = true;
                     break;
                 }
@@ -317,6 +327,44 @@ public class Main3 {
                     int rowsEffected = statement.executeUpdate(sqlQuery);
                     System.out.println(String.format("%d rows effected.", rowsEffected));
                 }
+            }
+        }
+        catch (SQLSyntaxErrorException e) {
+            System.err.println("Incorrect SQL Syntax.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("Connection to the database failed.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void executeSelectQuery() {
+        System.out.println("Enter a Select query to be executed :");
+        sc.nextLine();
+        String sqlQuery = sc.nextLine();
+        try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
+            try(Statement statement = connection.createStatement()) {
+                ResultSet result = statement.executeQuery(sqlQuery);
+                displayResultSet(result);
+            }
+        }
+        catch (SQLSyntaxErrorException e) {
+            System.err.println("Incorrect SQL Syntax.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("Connection to the database failed.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void executeNonSelectQuery() {
+        System.out.println("Enter a Non-Select query to be executed :");
+        sc.nextLine();
+        String sqlQuery = sc.nextLine();
+        try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
+            try(Statement statement = connection.createStatement()) {
+                int rowsEffected = statement.executeUpdate(sqlQuery);
+                System.out.println(String.format("%d rows effected.", rowsEffected));
             }
         }
         catch (SQLSyntaxErrorException e) {

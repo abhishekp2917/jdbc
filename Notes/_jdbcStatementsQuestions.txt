@@ -1,0 +1,150 @@
+*   How many types of statements are there in JDBC ?
+
+>>  In JDBC, there are three main types of statements that you can use to interact with a database:
+
+    (1) Statement:
+
+        The Statement interface is the simplest type of statement in JDBC. It allows you to execute SQL queries
+        and updates to the database. However, it doesn't provide support for parameterized queries or prepared statements,
+        making it susceptible to SQL injection attacks.
+
+    (2) PreparedStatement:
+
+        The PreparedStatement interface extends Statement and is used for executing parameterized SQL
+        queries. It allows you to precompile a SQL statement with placeholders for parameters, which are then set using
+        specific methods. This is more secure and efficient than regular Statement when executing the same query multiple
+        times with different parameter values.
+
+    (3) CallableStatement:
+
+        The CallableStatement interface is used for executing stored procedures in the database.
+        Stored procedures are database functions or routines that can be called from Java code. CallableStatement provides
+        methods for setting input and output parameters for stored procedures.
+
+________________________________________________________________________________________________________________________
+
+*   How PreparedStatement is better than Statement ?
+
+>>  In case of Statement, whenever we execute a query, it complies it first and then execute it. If we call the same
+    query with different values multiple time, that query will be compiled every time and then it will get executed.
+
+    ```
+        String sqlQuery = "<some sql query>";
+        Connection connection = DriverManager.getConnection(url, username, password);
+        Statement statement = connection.createStatement();
+
+        // at this point, the sql query will be transferred to RDBMS engine which will first compile it every time we call
+        // execute method and then it will execute it.
+        statement.executeQuery();
+        statement.executeQuery();
+    ```
+
+    In case of PreparedStatement, while creating it's object we need to pass the sql query. Due to which that query gets
+    transferred to RDBMS engine which will compile it will send the prepared (compiled) query back.
+
+    This compiled query can be executed as many times and each time RDBMS will just execute it but not complie it. This
+    way PreparedStatement has improved performance.
+
+    ```
+        String sqlQuery = "<some sql query>";
+        Connection connection = DriverManager.getConnection(url, username, password);
+
+        // here while creating PreparedStatement object, we have to pass sql query which will get compiled at this point
+        // itself. This compiled query doesn't require to recompile every time we execute it unlike Statement
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+
+        // at this point, the compiled sql query will be transferred to RDBMS engine which will just execute it every time
+        // we call the execute method.
+        preparedStatement.executeQuery();
+        preparedStatement.executeQuery();
+    ```
+________________________________________________________________________________________________________________________
+
+*   What is the static and dynamic query ?
+
+>>  Static query :
+
+        SQL query that whose values are hardcoded and doesn't change while execution is static query.
+        In below given query, ID value is hardcoded to 1. Hence, it is static query.
+
+        For example : SELECT * FROM student where ID=1
+
+    Dynamic query :
+
+        SQL query which has positional parameters whose values is not fixed and can change at run time
+        is called dynamic query. In below given query, ID value is not define and this value will be decided
+        at runtime. Such query is a dynamic query.
+
+        In dynamic query, parameters value should be not be a SQL keywords or any entity names like table name, column
+        name, views name etc.
+
+        For example : SELECT * FROM student where ID=?
+
+________________________________________________________________________________________________________________________
+
+*   Which are valid dynamic query syntax ?
+
+>>  Following are valid syntax :
+
+    (1) SELECT * FROM student where ID=? AND FirstName=?
+
+    (2) INSERT INTO student VALUES (?, ?, ?, ?)
+
+    (3) UPDATE student SET Age=? WHERE ID=?
+
+    Following are invalid syntax :
+
+    (1) SELECT * FROM ? where ID=? AND FirstName=?
+
+    (2) INSERT ? student VALUES (?, ?, ?, ?)
+
+    (3) UPDATE student SET ?=? WHERE ?=?
+
+________________________________________________________________________________________________________________________
+
+*   What are advantages and limitations of PreparedStatement ?
+
+>>  Advantages :
+
+    (1) Better performance compared to Statement because the SQL query will be compiled only once and can execute
+        this compiled query multiple times.
+
+    (2) Reduce traffic between Java Application and RDBMS because SQL query will be sent to RDBMS only once for
+        compilation after that one can execute the query multiple time by passing only set of parameter values.
+
+    (3) It is secure from SQL injection attack.
+
+    (4) Best suitable for dealing with large object like BLOB, CLOB etc.
+
+    Limitations :
+
+    (1) Since to PreparedStatement requires SQL query at the time instantiation, we can execute only one
+        SQL query with different parameter values unlike Statement where we can execute multiple queries.
+
+________________________________________________________________________________________________________________________
+
+*   What is the difference between Statement and PreparedStatement ?
+
+>>                  Statement                                                   PreparedStatement
+                                                     |
+     In Statement, we don't have to provide SQL      |  In PreparedStatement, we have to provide SQL query at the time
+     at the time of creating it's object.            |  of object instantiation.
+                                                     |
+     It only works with static query.                |  It works with both static and dynamic query.
+                                                     |
+     It compiles the query evertime we execute the   |  It compiles the query only once at the time of object
+     query which makes it less efficient.            |  instantiation and at the time of execution it just execute the query.
+                                                     |
+     One can execute multiple queries using          |  One can execute only one SQL query with different values using
+     statement object.                               |  PreparedStatement.
+                                                     |
+     It is prone to SQL injection attack.            |  It is secured from SQL injection attack.
+                                                     |
+     It is difficult to deal with large objects      |  PreparedStatement is best suitable for large objects.
+     (Binary large object - BLOB and Character large |
+     object CLOB) using Statement                    |
+                                                     |
+________________________________________________________________________________________________________________________
+
+
+
