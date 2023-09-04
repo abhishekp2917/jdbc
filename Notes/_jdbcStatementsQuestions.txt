@@ -146,5 +146,20 @@ ________________________________________________________________________________
                                                      |
 ________________________________________________________________________________________________________________________
 
+*   What is SQL injection and how 'Statement' is vulnerable to it and not 'PreparedStatement' ?
+
+>>  When attacker tries inject malicious SQL query to manipulate the structure or behaviour of the query, this is
+    called SQL injection attack. This happens when the application code doesn't validates or sanitize the user input.
+
+    Using simple 'Statement' object to execute the SQL query which is prone to SQL Injection attack because the query is
+    compiled at the time of execution. If the user injects any malicious SQL specific character, the SQL query structure
+    might change which will eventually make query behaving differently on execution.
+
+    In 'PreparedStatement', the query gets compiled before injecting the parameters value due to which the structure of
+    query will remain intact. When the user enters any SQL specific values, since the query structure is predefined,
+    those values will be taken as parameter values and will not alter the query. This way it is secure form SQL injection.
+
+________________________________________________________________________________________________________________________
+
 
 
