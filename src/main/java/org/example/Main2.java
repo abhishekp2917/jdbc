@@ -1,3 +1,8 @@
+/*
+   Code to demonstrate how to connect to DB and execute Non-Select query in JDBC
+*/
+
+
 package org.example;
 
 import java.sql.*;

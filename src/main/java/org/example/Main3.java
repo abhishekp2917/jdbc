@@ -1,6 +1,9 @@
+/*
+   Code to demonstrate how to execute Select and Non-Select query using Statement in JDBC
+*/
+
 package org.example;
 
-import javax.sql.RowSet;
 import java.sql.*;
 import java.util.*;
 

@@ -1,8 +1,11 @@
+/*
+   Code to demonstrate Statement and PreparedStatement
+*/
+
 package org.example;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main4 {

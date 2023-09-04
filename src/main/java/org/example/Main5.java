@@ -1,3 +1,7 @@
+/*
+   Code to demonstrate SQL injection and how PreparedStatement is secured from it
+*/
+
 package org.example;
 
 import java.sql.*;

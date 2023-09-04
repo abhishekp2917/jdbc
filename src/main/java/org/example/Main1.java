@@ -1,3 +1,7 @@
+/*
+   Code to demonstrate how to connect to DB and execute Select query to get the records in JDBC
+*/
+
 package org.example;
 
 import java.sql.*;
