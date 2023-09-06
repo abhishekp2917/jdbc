@@ -161,5 +161,25 @@ ________________________________________________________________________________
 
 ________________________________________________________________________________________________________________________
 
+*   What is CallableStatement ?
+
+>>  A 'CallableStatement' is a specialized interface used to execute stored procedures or functions in a database.
+    It extends the PreparedStatement interface and provides methods for executing database stored procedures or callable
+    SQL statements.
+
+    After creating object of 'CallableStatement', we have to bind input parameter as well as have to register output
+    parameters if there's any.
+
+    To execute the SP, we can use any of the three execute method. But to get the results from SP, we have to very
+    specific.
+
+    If the SP executes any select query and we want to get that result set of it, we must use executeQuery method.
+
+    if we want the count of rows effected by SP, we have to use executeUpdate method.
+
+________________________________________________________________________________________________________________________
+
+
+
 
 

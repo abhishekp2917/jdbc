@@ -4,6 +4,7 @@
 
 package org.example;
 
+import org.example.utils.DisplayResultSet;
 import java.sql.*;
 import java.util.*;
 
@@ -301,7 +302,7 @@ public class Main3 {
             try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
                 try(Statement statement = connection.createStatement()) {
                     ResultSet result = statement.executeQuery(sqlQuery);
-                    displayResultSet(result);
+                    DisplayResultSet.display(result);
                 }
             }
             catch (SQLSyntaxErrorException e) {
@@ -324,7 +325,7 @@ public class Main3 {
             try(Statement statement = connection.createStatement()) {
                 if(statement.execute(sqlQuery)) {
                     ResultSet result = statement.executeQuery(sqlQuery);
-                    displayResultSet(result);
+                    DisplayResultSet.display(result);
                 }
                 else {
                     int rowsEffected = statement.executeUpdate(sqlQuery);
@@ -348,7 +349,7 @@ public class Main3 {
         try(Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
             try(Statement statement = connection.createStatement()) {
                 ResultSet result = statement.executeQuery(sqlQuery);
-                displayResultSet(result);
+                DisplayResultSet.display(result);
             }
         }
         catch (SQLSyntaxErrorException e) {
@@ -398,47 +399,4 @@ public class Main3 {
         }
         return columnsList;
     }
-
-    private static void displayResultSet(ResultSet result) {
-        try{
-
-            // ResultSetMetaData hold meta data i.e. data about the data (result set) such as
-            // column count, column name of a specific index etc
-            ResultSetMetaData metaData = result.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            int[] columnMaxSize = new int[columnCount];
-            for(int i=1; i<=columnCount; i++) {
-                columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], metaData.getColumnName(i).length());
-            }
-            ArrayList<String[]> records = new ArrayList<>();
-            while(result.next()) {
-                String[] record = new String[columnCount];
-                for(int i=1; i<=columnCount; i++) {
-                    record[i-1] = result.getString(i);
-                    columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], record[i-1].length());
-                }
-                records.add(record);
-            }
-            System.out.println("\n_________________________________________________");
-            for(int i=1; i<=columnCount; i++) {
-                int desiredWidth = columnMaxSize[i-1];
-                String stringWithTrailingSpaces = String.format("%-" + desiredWidth + "s", metaData.getColumnName(i));
-                System.out.print(String.format("\t%s\t", stringWithTrailingSpaces));
-            }
-            System.out.println("\n_________________________________________________");
-            for(String[] record : records) {
-                for(int i=0; i<record.length; i++) {
-                    int desiredWidth = columnMaxSize[i];
-                    String stringWithTrailingSpaces = String.format("%-" + desiredWidth + "s", record[i]);
-                    System.out.print(String.format("\t%s\t", stringWithTrailingSpaces));
-                }
-                System.out.println();
-            }
-            System.out.println("_________________________________________________\n");
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
