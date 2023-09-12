@@ -223,3 +223,98 @@ ________________________________________________________________________________
         connection.close();
     ```
 ________________________________________________________________________________________________________________________
+
+*   What is the use of batch updates ?
+
+>>  A batch updates is a mechanism that allows you to execute multiple SQL statements in a single batch, rather than
+    executing them one at a time. This can provide performance benefits and reduce the overhead of round-trips between
+    your application and the database server.
+
+    Batch updates can significantly improve the performance of database operations, especially when you need to insert,
+    update, or delete multiple rows of data. By sending multiple statements in a single batch, you reduce the overhead
+    associated with each individual SQL statement execution.
+
+    One can execute SQL Non-select query in a batch using 'executeBatch' method. It is to be noted that this method
+    can execute batch of SQL query which has Non-Select queries only else it will give an exception.
+
+    Consider below explanation that shows how batch updates improves performance
+
+
+
+    ---------------------     Request Time          -----------------
+    |                   |-------------------------->|               | Compilation Time
+    |       Java        |                           |    Database   |
+    |    Application    |<--------------------------|               |
+    |                   |     Response Time         |               | Execution Time
+    ---------------------                           -----------------
+
+
+    To make a request to a DB to execute a query and to get the response includes  Request Time, Response Time,
+    compilation Time and Execution Time.
+
+    Lets say for sake of simplicity, all of this will take 1 ms each.
+
+    Below are 4 scenarios in which we want to execute 1000 queries using different combination of Statements and Batch
+    updates :
+
+    (1) Executing all the queries using simple Statement without batch updates :
+
+        Time required to execute 1 query = Req Time + Res Time + Compilation Time + Exec Time
+                                         = 1 ms + 1 ms + 1 ms + 1 ms
+                                         = 4 ms
+        Time required to execute 1000 query = Time required to execute 1 query * 1000
+                                            = 4000 ms
+
+    (2) Executing all the queries using PreparedStatement without batch updates :
+
+            Time required to execute 1 query = Req Time + Res Time + Exec Time
+                                             = 1 ms + 1 ms + 1 ms
+                                             = 3 ms
+            Time required to execute 1000 query = Time required to execute 1 query * 1000 + Compilation Time
+                                                = 3000 ms + 1 ms
+                                                = 3001 ms
+
+    (3) Executing all the queries using simple Statement with batch updates :
+
+            Time required to execute 1000 query = Req Time + Compilation Time * 1000 + Exec Time * 1000 + Res Time
+                                                = 1 ms + 1 ms * 1000 + 1 ms * 1000 + 1 ms
+                                                = 2002 ms
+
+    (4) Executing all the queries using PreparedStatement with batch updates :
+
+            Time required to execute 1000 query = Req Time + Compilation Time + Exec Time * 1000 + Res Time
+                                                = 1 ms + 1 ms + 1 ms * 1000 + 1 ms
+                                                = 1003 ms
+
+________________________________________________________________________________________________________________________
+
+*   What is the connection pooling ?
+
+>>  Connection pooling is the process of creating and managing a pool of database connections that can be reused by
+    multiple clients (application threads or processes) instead of creating a new connection for each client request.
+
+    Connection pooling reduces the overhead of establishing and tearing down database connections for each client
+    request. Reusing existing connections is faster and more efficient.
+
+________________________________________________________________________________________________________________________
+
+*   What is the process of implementing connection pooling ?
+
+>>   Following steps must be followed to implement connection pooling :
+
+    (1) Create 'DataSource' object.
+
+        'DataSource' is responsible to manage connections in connection pool.
+        It is an Interface present in 'javax.sql' package.
+
+    (2) Set required JDBC properties to the 'DataSource' object.
+
+        Set the JDBC url, username, password etc to the 'DataSource' object.
+
+    (3) Get the connection from 'DataSource' object.
+
+________________________________________________________________________________________________________________________
+
+
+
+
