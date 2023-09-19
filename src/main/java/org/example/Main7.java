@@ -1,5 +1,5 @@
 /*
-   Code to demonstrate how to execute stored procedure and functions using CallableStatement
+   Code to demonstrate how to execute sql queries in batches using batch updates with different Statement object
 */
 
 package org.example;

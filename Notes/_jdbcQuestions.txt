@@ -315,6 +315,34 @@ ________________________________________________________________________________
 
 ________________________________________________________________________________________________________________________
 
+*   How many 'getConnection' methods are available ?
 
+>>  There are three overloaded 'getConnection' method present :
 
+    (1) 'getConnection' with 3 argument :
+
+        In this case, pass the jdbcUrl, username and password as it is as an argument
+
+        ```
+            Connection con = DriverManager.getConnection(String jdbcUrl, String user, String password);
+        ```
+
+    (2) 'getConnection' with 2 argument :
+
+        In this case, pass the jdbcUrl in string form and for username and password, load the '.properties' file having
+        DB username and password as key value (user=<USERNAME> and password=<PASSWORD>) in Properties object. Then pass
+        this Properties object as 2nd argument.
+
+        ```
+            Connection con = DriverManager.getConnection(String jdbcUrl, Properties properties);
+        ```
+
+    (3) 'getConnection' with 1 argument :
+
+        In this case, pass jdbcUrl which will have DB username and password as a query parameter
+
+        ```
+            Connection con = DriverManager.getConnection(String jdbcUrl);
+        ```
+________________________________________________________________________________________________________________________
 

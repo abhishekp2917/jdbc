@@ -1,5 +1,5 @@
 /*
-   Code to demonstrate how to execute stored procedure and functions using CallableStatement
+   Code to demonstrate connection pooling using third-party library
 */
 
 package org.example;
