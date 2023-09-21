@@ -1,0 +1,345 @@
+*   What are BLOB and CLOB ?
+
+>>  BLOB and CLOB are data types used to store large volumes of data, such as binary data (BLOB) or text data (CLOB).
+    Here's what they stand for and how they are typically used:
+
+    (1) BLOB (Binary Large Object):
+
+        BLOB stands for "Binary Large Object".
+
+        It is a database data type used to store binary data, such as images, audio, video, or any other type of binary
+        file.
+
+        BLOBs can store a wide range of binary data, and their size can vary from small to very large.
+
+        Examples of BLOB data include images in a photo database, audio files in a music database, or documents in a
+        document management system.
+
+    (2) CLOB (Character Large Object):
+
+        CLOB stands for "Character Large Object".
+
+        It is a database data type used to store large amounts of text data, typically in character encoding formats
+        like UTF-8 or UTF-16.
+
+        CLOBs are used to store text-based data, such as long articles, documents, or textual data that exceeds the
+        capacity of standard VARCHAR or TEXT columns.
+
+        CLOBs are suitable for storing textual data that requires extensive search and indexing capabilities.
+
+________________________________________________________________________________________________________________________
+
+*   What are the steps to insert BLOB into DB ?
+
+>>  Following are the steps to insert BLOB into DB :
+
+    (1) Create File object to represent Binary file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (2) Create FileInputStream to read Binary file.
+
+        ```
+            FileInputStream inputStream = new FileInputStream(file);
+        ```
+
+    (3) Create PreparedStatement to execute the insert query. We can use simple Statement object also for inserting but
+        in that approach, first we have to convert Binary file into Hexadecimal string format which is a tedious task.
+        Moreover, simple Statement is prone to SQL injection. Keeping all this in mind, it's better to use
+        PreparedStatement.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("Insert INTO person VALUES (?, ?)");
+        ```
+
+    (4) Pass the FileInputStream as a parameter value to the PreparedStatement and execute the PreparedStatement.
+
+        ```
+            preparedStatement.setBinaryStream(2, inputStream);
+            preparedStatement.executeUpdate();
+        ```
+
+________________________________________________________________________________________________________________________
+
+*   What are the steps to retrieve BLOB from DB ?
+
+>>  Following are the steps to retrieve BLOB from DB :
+
+    (1) Create PreparedStatement and execute the select query. We can use simple Statement object also in this case.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("SELECT * FROM person");
+        ```
+
+    (2) Get the InputStream from the ResultSet that is being retrieved.
+
+        ```
+            InputStream inputStream = resultSet.getBinaryStream(2);
+        ```
+
+    (3) Create File object to represent Binary file where you want to store the file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (4) Create FileOutputStream to write Binary file.
+
+        ```
+            FileOutputStream outputStream = new FileOutputStream(file);
+        ```
+
+    (5) Read the binary file from the InputStream and write it to file using OutputStream.
+
+        ```
+            int data;
+            while ((data = inputStream.read()) != -1) {
+                outputStream.write(data);
+            }
+        ```
+________________________________________________________________________________________________________________________
+
+*   What are the steps to insert CLOB into DB ?
+
+>>  Following are the steps to insert BLOB into DB :
+
+    (1) Create File object to represent Binary file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (2) Create FileReader to read Character file.
+
+        ```
+            FileReader fileReader = new FileReader(file);
+        ```
+
+    (3) Create PreparedStatement to execute the insert query.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("Insert INTO person VALUES (?, ?)");
+        ```
+
+    (4) Pass the FileReader as a parameter value to the PreparedStatement and execute the PreparedStatement.
+
+        ```
+            preparedStatement.setCharacterStream(2, fileReader);
+            preparedStatement.executeUpdate();
+        ```
+________________________________________________________________________________________________________________________
+
+*   What are the steps to retrieve CLOB from DB ?
+
+>>  Following are the steps to retrieve CLOB from DB :
+
+    (1) Create PreparedStatement and execute the select query. We can use simple Statement object also in this case.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("SELECT * FROM person");
+        ```
+
+    (2) Get the Reader from the ResultSet that is being retrieved.
+
+        ```
+            Reader fileReader = resultSet.getCharacterStream(2);
+        ```
+
+    (3) Create File object to represent Binary file where you want to store the file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (4) Create FileOutputStream to write Binary file.
+
+        ```
+            FileOutputStream outputStream = new FileOutputStream(file);
+        ```
+
+    (5) Read the binary file from the reader and write it to file using OutputStream.
+
+        ```
+            int data;
+            while ((data = fileReader.read()) != -1) {
+                outputStream.write(data);
+            }
+        ```
+________________________________________________________________________________________________________________________
+
+*   What is the need of buffer while inserting or reading large object ?
+
+>>  Let say we want to read/write 10KB of data i.e. equal to 10 * (1024) Byte of data.
+
+    (1) Without using buffer :
+
+        -----------------                   -----------------
+        |               |                   |               |
+        |     10KB      |------------------>|               |
+        |     data      |<------------------|               |
+        |               |                   |               |
+        -----------------                   -----------------
+            source                              destination
+
+        10KB = 10 * (1024) = 10240 Byte data
+
+        To read/write 10KB of data, total of 10240 read/write operation is required which will impact the overall
+        performance
+
+    (2) Using buffer :
+
+        -----------------             ------------             -----------------
+        |               |             |          |             |               |
+        |     10KB      |------------>|   1KB    |------------>|               |
+        |     data      |<------------|  Buffer  |<------------|               |
+        |               |             |          |             |               |
+        -----------------             ------------             -----------------
+            source                       Buffer                   destination
+
+        10KB = 10 * (1024) = 10240 Byte data
+        1KB = 1024 Byte of Buffer
+
+        To read/write 10KB of data, total of 10240/(Buffer size) = 10 read/write operation is required which will
+        improve the performance
+
+________________________________________________________________________________________________________________________
+
+*   What are the steps to insert BLOB into DB using buffer ?
+
+>>  Following are the steps to insert BLOB into DB :
+
+    (1) Create File object to represent Binary file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (2) Create FileReader to read Character file.
+
+        ```
+            FileReader fileReader = new FileReader(file);
+        ```
+
+    (3) Create PreparedStatement to execute the insert query.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("Insert INTO person VALUES (?, ?)");
+        ```
+
+    (4) Pass the FileReader as a parameter value to the PreparedStatement and execute the PreparedStatement.
+
+        ```
+            preparedStatement.setCharacterStream(2, fileReader);
+            preparedStatement.executeUpdate();
+        ```
+________________________________________________________________________________________________________________________
+
+*   What are the steps to retrieve BLOB from DB using buffer ?
+
+>>  Following are the steps to retrieve BLOB from DB :
+
+    (1) Create PreparedStatement and execute the select query. We can use simple Statement object also in this case.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("SELECT * FROM person");
+        ```
+
+    (2) Get the InputStream from the ResultSet that is being retrieved.
+
+        ```
+            InputStream inputStream = resultSet.getBinaryStream(2);
+        ```
+
+    (3) Create File object to represent Binary file where you want to store the file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (4) Create FileOutputStream to read Binary file.
+
+        ```
+            FileOutputStream outputStream = new FileOutputStream(file);
+        ```
+
+    (5) Create a byte buffer array of a specif length. Then read the binary file from the InputStream and write it to \
+        file using OutputStream.
+
+        ```
+           byte[] buffer = new byte[1024];
+           while ((inputStream.read(buffer)) != -1) {
+               fileOutputStream.write(buffer);
+           }
+        ```
+________________________________________________________________________________________________________________________
+
+*   What are the steps to insert CLOB into DB using buffer ?
+
+>>  Following are the steps to insert CLOB into DB :
+
+    (1) Create File object to represent Binary file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (2) Create FileReader to read Character file.
+
+        ```
+            FileReader fileReader = new FileReader(file);
+        ```
+
+    (3) Create PreparedStatement to execute the insert query.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("Insert INTO person VALUES (?, ?)");
+        ```
+
+    (4) Pass the FileReader as a parameter value to the PreparedStatement and execute the PreparedStatement.
+
+        ```
+            preparedStatement.setCharacterStream(2, fileReader);
+            preparedStatement.executeUpdate();
+        ```
+________________________________________________________________________________________________________________________
+
+*   What are the steps to retrieve CLOB from DB using buffer ?
+
+>>  Following are the steps to retrieve CLOB from DB :
+
+    (1) Create PreparedStatement and execute the select query. We can use simple Statement object also in this case.
+
+        ```
+            PreparedStatement preparedStatement = new connection.prepareStatement("SELECT * FROM person");
+        ```
+
+    (2) Get the Reader from the ResultSet that is being retrieved.
+
+        ```
+            Reader fileReader = resultSet.getCharacterStream(2);
+        ```
+
+    (3) Create File object to represent Binary file where you want to store the file.
+
+        ```
+            File file = new File("abc.jpg");
+        ```
+
+    (4) Create FileWriter to write Binary file.
+
+        ```
+            FileWriter fileWriter = new FileWriter(file);
+        ```
+
+    (5) Create a char buffer array of a specific length. Then read the binary file from the fileReader and write it to
+        file using fileWriter.
+
+        ```
+           char[] buffer = new char[1024];
+           while ((fileReader.read(buffer)) != -1) {
+               fileWriter.write(buffer);
+           }
+        ```
+________________________________________________________________________________________________________________________

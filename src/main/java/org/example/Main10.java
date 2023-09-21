@@ -144,7 +144,7 @@ public class Main10 {
                     properties.getProperty("url"),
                     properties.getProperty("user"),
                     properties.getProperty("password"));
-            // creating connection by passing juts jdbc url which has db user and password as a query parameter
+            // creating connection by passing just jdbc url which has db user and password as a query parameter
             try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
                 try (Statement statement = connection.createStatement()) {
                     String sqlQuery = "SELECT * FROM student";
