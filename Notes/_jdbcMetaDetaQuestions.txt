@@ -1,0 +1,56 @@
+*   How many types of meta data present in JDBC ?
+
+>>  There are three types of meta data present in JDBC :
+
+    (1) Database Metadata (DatabaseMetaData):
+
+        This type of metadata provides information about the database itself.
+        You can obtain an instance of DatabaseMetaData from a Connection object using the getMetaData() method. With
+        DatabaseMetaData, you can retrieve information such as the database name, version, supported SQL features,
+        supported data types, table names, column names, and more.
+
+        ```
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/temp", "user", "password");
+            DatabaseMetaData metaData = connection.getMetaData();
+            System.out.println("Database Name: " + metaData.getDatabaseProductName());
+            System.out.println("Database Version: " + metaData.getDatabaseProductVersion());
+        ```
+
+    (2) Result Set Metadata (ResultSetMetaData):
+
+        This type of metadata provides information about the structure of a result set obtained from executing SQL queries.
+        You can obtain an instance of ResultSetMetaData from a ResultSet object using the getMetaData() method. With
+        ResultSetMetaData, you can retrieve information about the columns in the result set, such as column names, data
+        types, column sizes, and whether columns can accept null values.
+
+        ```
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM employees");
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                System.out.println("Column Name: " + metaData.getColumnName(i));
+                System.out.println("Column Type: " + metaData.getColumnTypeName(i));
+            }
+        ```
+
+    (3) Parameter Metadata (ParameterMetaData) :
+
+        Parameter metadata in JDBC refers to information about the parameters used in a prepared statement or callable
+        statement. It helps you understand the data types and other characteristics of parameters that you bind to a SQL
+        statement. You can obtain an instance of ParameterMetaData from a PreparedStatement or CallableStatement object
+        using the getParameterMetaData() method. You can use this metadata to determine how to set the parameters
+        correctly when executing SQL queries or stored procedures.
+
+        ```
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/temp", "user", "password");
+            String sql = "INSERT INTO employees (id, name, age) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ParameterMetaData parameterMetaData = preparedStatement.getParameterMetaData();
+            int parameterCount = parameterMetaData.getParameterCount();
+            for (int i = 1; i <= parameterCount; i++) {
+                System.out.println("Parameter " + i + " Type: " + parameterMetaData.getParameterType(i));
+                System.out.println("Parameter " + i + " Type Name: " + parameterMetaData.getParameterTypeName(i));
+            }
+        ```
+________________________________________________________________________________________________________________________

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 // utility class to display records of ResultSet
 public class DisplayResultSet {
     public static void display(ResultSet result) {
+        if(result==null) return;
         try{
             // ResultSetMetaData hold meta data i.e. data about the data (result set) such as
             // column count, column name of a specific index etc
@@ -22,17 +23,21 @@ public class DisplayResultSet {
                 String[] record = new String[columnCount];
                 for(int i=1; i<=columnCount; i++) {
                     record[i-1] = result.getString(i);
-                    columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], record[i-1].length());
+                    if(record[i-1]!=null)columnMaxSize[i-1] = Math.max(columnMaxSize[i-1], record[i-1].length());
                 }
                 records.add(record);
             }
-            System.out.println("\n_________________________________________________");
+            int tableWidth = 0;
+            for(int i=1; i<=columnCount; i++) {
+                tableWidth += columnMaxSize[i-1] + 7;
+            }
+            printLine(tableWidth);
             for(int i=1; i<=columnCount; i++) {
                 int desiredWidth = columnMaxSize[i-1];
                 String stringWithTrailingSpaces = String.format("%-" + desiredWidth + "s", metaData.getColumnName(i));
                 System.out.print(String.format("\t%s\t", stringWithTrailingSpaces));
             }
-            System.out.println("\n_________________________________________________");
+            printLine(tableWidth);
             for(String[] record : records) {
                 for(int i=0; i<record.length; i++) {
                     int desiredWidth = columnMaxSize[i];
@@ -41,10 +46,16 @@ public class DisplayResultSet {
                 }
                 System.out.println();
             }
-            System.out.println("_________________________________________________\n");
+            printLine(tableWidth);
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void printLine(int length) {
+        System.out.print("\n");
+        for(int i=0; i<length; i++) System.out.print("=");
+        System.out.print("\n");
     }
 }
