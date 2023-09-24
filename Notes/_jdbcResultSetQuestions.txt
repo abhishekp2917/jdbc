@@ -1,0 +1,108 @@
+*   How many types of ResultSet are available in jdbc ?
+
+>>  All the ResultSet in jdbc are divided based on three categories :
+
+    (1) Based on operations allowed (Mode) :
+
+        (a) Read-Only ResultSet (CONCUR_READ_ONLY):
+
+            -   This type of ResultSet is read-only, and you cannot update the data through the result set.
+            -   It's the default concurrency mode.
+            -   Useful when you only need to fetch and display data without making updates.
+
+        (b) Updatable ResultSet (CONCUR_UPDATABLE):
+
+            -   This type of ResultSet allows you to update the data in the database through the result set.
+            -   It's useful when you want to perform data modifications using the result set itself.
+
+    (2) Based on cursor movement (Type) :
+
+        (a) Forward-Only ResultSet (TYPE_FORWARD_ONLY):
+
+            -   This is the default type of ResultSet.
+            -   It allows you to move forward in a linear manner, one row at a time.
+            -   It is the most memory-efficient type of ResultSet as it doesn't cache rows, making it suitable for
+                large result sets.
+            -   It doesn't support scrolling backward or random access to rows due to which to access nth row, it
+                requires O(n+1) time iteration making it low in performance.
+
+        (b) Scrollable ResultSet :
+
+            -   This type of ResultSet allows you to move both forward and backward or jump to any particular row
+                through the result set.
+            -   It is the most memory-inefficient type of ResultSet as it cache rows so that one can randomly access a
+                particular row.
+            -   It support scrolling backward or random access to rows due to which it takes O(1) time to access nth row
+                making it high in performance.
+            -   It is further divided into two types :
+
+            (i) Scroll-Sensitive ResultSet (TYPE_SCROLL_SENSITIVE):
+
+                -   It maintains a sensitive cursor position, meaning if we make any update to the DB after getting
+                    ResultSet, those updated values will be reflected in the ResultSet.
+                -   It can be used when you need to navigate the result set in a bidirectional manner and need to see
+                    changes made to the data since the result set was created.
+                -   Since it is scroll sensitive, every time we ask for a record, it makes request to DB to check for
+                    updated data which makes it performance wise inefficient.
+
+            (ii) Scroll-Insensitive ResultSet (TYPE_SCROLL_INSENSITIVE):
+
+                -   Unlike scroll-sensitive, it does not reflect changes made by other processes; it's a snapshot of
+                    the data at the time the result set was created.
+                -   It's suitable when you need to navigate the result set bidirectionally but don't need to see
+                    real-time changes.
+                -   Since it is scroll insensitive, every time we ask for a record, it doesn't make any request to DB
+                    which makes it performance wise more efficient.
+
+    (3) Based on holdability :
+
+        (a) ResultSet with Holdability (HOLD_CURSORS_OVER_COMMIT):
+
+            -   This type of result set remains open and valid even after the associated transaction is committed.
+            -   It allows you to continue using the result set's data even after committing changes to the database.
+            -   It is suitable when you need to work with the result set data across multiple transactions.
+
+        (b) ResultSet without Holdability (CLOSE_CURSORS_AT_COMMIT):
+
+            -   This type of result set is closed automatically when the associated transaction is committed.
+            -   It does not allow you to access the result set data after the transaction is committed.
+            -   It is useful when you want to ensure that the result set is not accessible after the transaction is
+                completed to prevent unintended data access.
+________________________________________________________________________________________________________________________
+
+*   How to get a required ResultSet ?
+
+>>  To get required ResultSet, one have to configure Statement/PreparedStatement object by passing ResultSet constants
+    to the Statement/PreparedStatement constructor.
+
+    Below is the list of constants for specific mode, type or holdability. Pass this constants value as per below code
+    to get desired ResultSet type.
+
+    (1) Type constants :
+
+        -   Forward-Only ResultSet : ResultSet.TYPE_FORWARD_ONLY
+        -   Scroll-Sensitive ResultSet : ResultSet.TYPE_SCROLL_INSENSITIVE
+        -   Scroll-Insensitive ResultSet : ResultSet.TYPE_SCROLL_SENSITIVE
+
+    (2) Mode constants :
+
+        -   Read-Only ResultSet : ResultSet.CONCUR_READ_ONLY
+        -   Updatable ResultSet : ResultSet.CONCUR_UPDATABLE
+
+    (3) Holdability constants :
+
+        -   ResultSet with Holdability : ResultSet.HOLD_CURSORS_OVER_COMMIT
+        -   ResultSet without Holdability : ResultSet.CLOSE_CURSORS_AT_COMMIT
+
+    ```
+        Statement statement = connection.createStatement(
+                                            <Type_Constant>,
+                                            <Mode_Constant>,
+                                            <Holdability_Constant>);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                                                            <Type_Constant>,
+                                                            <Mode_Constant>,
+                                                            <Holdability_Constant>);
+    ```
+________________________________________________________________________________________________________________________

@@ -20,6 +20,7 @@ public class DisplayResultSet {
             }
             ArrayList<String[]> records = new ArrayList<>();
             while(result.next()) {
+                if(result.getType()==ResultSet.TYPE_SCROLL_SENSITIVE) result.refreshRow();
                 String[] record = new String[columnCount];
                 for(int i=1; i<=columnCount; i++) {
                     record[i-1] = result.getString(i);
