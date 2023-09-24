@@ -1,0 +1,129 @@
+*   How many date class present in java ?
+
+>>  There are two date classes present in java :
+
+    (1) java.util.Date
+
+    (2) java.sql.Date
+
+________________________________________________________________________________________________________________________
+
+*   What is the difference between java.util.Date and java.sql.Date ?
+
+>>              java.util.Date                                  java.sql.Date
+
+    Represents both date and time, including    |   Represents only the date component (year, month, day) and is child
+    hours, minutes, seconds, and milliseconds   |   class of java.util.Date
+                                                |
+    Used for general-purpose date and time      |   Specifically designed for working with dates in a database context
+    handling.                                   |
+                                                |
+
+________________________________________________________________________________________________________________________
+
+*   Why to use java.sql.Date instead of String or java.util.Date ?
+
+>>  Following are the advantages of using java.sql.Date :
+
+    (1) Type Safety:
+
+        java.sql.Date is designed specifically for compatibility with relational databases. When you use it, the
+        database can understand the date format, making it easier to perform database operations like filtering,
+        sorting, and comparisons directly on date columns without explicit conversions.
+
+    (2) Database Integration:
+
+        java.sql.Date is a dedicated data type for representing dates in JDBC. Using it provides type safety and
+        ensures that you are working with dates, not arbitrary strings or general-purpose date-time objects.
+
+    (3) Compatibility :
+
+        Many database operations and libraries, especially those involving JDBC, expect date values to be represented
+        as java.sql.Date or its related types. Using other representations may require additional conversion code.
+
+    (4) Easier Date Arithmetic:
+
+        When working with date-related calculations, java.sql.Date provides methods for date arithmetic
+        (e.g., adding days) and comparisons, making date manipulations more straightforward.
+
+________________________________________________________________________________________________________________________
+
+*   Why to use PreparedStatement while dealing with Dates ?
+
+>>  Following are the advantages of using PreparedStatement with java.sql.Date :
+
+    (1) Type Safety:
+
+        When you use setDate() or related methods on a PreparedStatement, you provide the date value with the correct
+        data type (in this case, java.sql.Date). This ensures type safety and avoids data type conversion issues.
+
+    (2) Avoids String Parsing Issues:
+
+        When you use setDate(), you provide the date value as a java.sql.Date object, which eliminates the need for
+        manual date string parsing. This reduces the risk of date format errors and simplifies date handling.
+
+    (3) Database Compatibility:
+
+        Different databases may have different date and time representations. Prepared statements abstract these
+        differences, allowing your code to work seamlessly with various database systems.
+
+________________________________________________________________________________________________________________________
+
+*   How to convert Date from String to java.sql.Date ?
+
+>>  Follow below steps to convert Date from String to java.sql.Date :
+
+    (1) Define a sample date string dateString in the format "yyyy-MM-dd," which is a common ISO date format.
+
+         ```
+            String dateString = "2023-09-22";
+        ```
+
+    (2) Create a SimpleDateFormat object called dateFormat with the same date format as the input string.
+
+        ```
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ```
+
+    (3) Use dateFormat.parse(dateString) to parse the String and obtain a java.util.Date object.
+
+        ```
+             java.util.Date utilDate = dateFormat.parse(dateString);
+        ```
+
+    (4) Create a java.sql.Date object by passing the milliseconds from the java.util.Date object to its constructor.
+
+        ```
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        ```
+________________________________________________________________________________________________________________________
+
+*   How to convert java.sql.Date to string of specific date format from the ResultSet ?
+
+>>  Follow below steps to convert Date from java.sql.Date to String of desired format :
+
+    (1) Get the java.sql.Date object :
+
+        ```
+            java.sql.Date sqlDate = resultSet.getDate(2);
+        ```
+    (2) Define the desired date format as a string, such as "yyyy-MM-dd."
+
+        ```
+            String dateFormat = "dd-MM-yyyy";
+        ```
+
+    (3) Create a SimpleDateFormat object with the desired format.
+
+        ```
+            SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        ```
+
+    (4) Use the format() method to format the java.sql.Date as a String using the specified format.
+
+        ```
+            String formattedDate = sdf.format(sqlDate);
+        ```
+________________________________________________________________________________________________________________________
+
+
