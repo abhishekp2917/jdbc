@@ -5,12 +5,9 @@
 package org.example;
 
 import org.example.utils.DisplayResultSet;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -264,10 +261,13 @@ public class Main14 {
     private static void insertRecordUsingResultSet() {
         String sqlQuery = "SELECT * FROM student";
         try(Connection connection = getConnection()) {
+            // creating Statement object and configuring it with ResultSet constants as scroll sensitive, updatable
+            // it is not necessary to select type as Scrollable along with Updatable mode
             try(Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                 ResultSet resultSet = statement.executeQuery(sqlQuery);
                 System.out.println("Records before update :");
                 DisplayResultSet.display(resultSet);
+                // This will create a new row in ResultSet and will move the cursor to that row
                 resultSet.moveToInsertRow();
                 System.out.print("Enter ID :");
                 int id = sc.nextInt();
@@ -277,10 +277,12 @@ public class Main14 {
                 String lastName = sc.next();
                 System.out.print("Enter age :");
                 int age = sc.nextInt();
+                // inserting the values to newly added row
                 resultSet.updateInt(1, id);
                 resultSet.updateString(2, firstName);
                 resultSet.updateString(3, lastName);
                 resultSet.updateInt(4, age);
+                // once all the values added to row, insert the record to teh database
                 resultSet.insertRow();
                 System.out.println("Records after insertion of new record :");
                 resultSet.beforeFirst();
@@ -298,12 +300,14 @@ public class Main14 {
     private static void updateRecordUsingResultSet() {
         String sqlQuery = "SELECT * FROM student";
         try(Connection connection = getConnection()) {
+            // creating Statement object and configuring it with ResultSet constants as scroll sensitive, updatable
             try(Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                 ResultSet resultSet = statement.executeQuery(sqlQuery);
                 System.out.println("Records before update :");
                 DisplayResultSet.display(resultSet);
                 System.out.print("Enter row number that needs to be updated :");
                 int rowNumber = sc.nextInt();
+                // moving the cursor to the row which we want to update
                 resultSet.absolute(rowNumber);
                 System.out.print("Enter firstName :");
                 String firstName = sc.next();
@@ -311,9 +315,11 @@ public class Main14 {
                 String lastName = sc.next();
                 System.out.print("Enter age :");
                 int age = sc.nextInt();
+                // updating row values with new value
                 resultSet.updateString(2, firstName);
                 resultSet.updateString(3, lastName);
                 resultSet.updateInt(4, age);
+                // this will make request to DB which will update the record in DB
                 resultSet.updateRow();
                 System.out.println("Records after update :");
                 resultSet.beforeFirst();
@@ -331,13 +337,16 @@ public class Main14 {
     private static void deleteRecordUsingResultSet() {
         String sqlQuery = "SELECT * FROM student";
         try(Connection connection = getConnection()) {
+            // creating Statement object and configuring it with ResultSet constants as scroll sensitive, updatable
             try(Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                 ResultSet resultSet = statement.executeQuery(sqlQuery);
                 System.out.println("Records before deletion :");
                 DisplayResultSet.display(resultSet);
                 System.out.print("Enter row number that needs to be deleted :");
                 int rowNumber = sc.nextInt();
+                // moving the cursor to the row which we want to delete
                 resultSet.absolute(rowNumber);
+                // this will make request to DB which will delete the record in DB
                 resultSet.deleteRow();
                 System.out.println("Records after deletion :");
                 resultSet.beforeFirst();
@@ -353,39 +362,24 @@ public class Main14 {
     }
 
     private static void closeResultSetCursorAtCommit() {
-        String sqlQuery = "INSERT INTO policy (EffectiveDate, ExpirationDate) VALUES (?, ?)";
+        String sqlQuery = "SELECT * FROM student";
         try(Connection connection = getConnection()) {
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-                // getting date values from user in 'dd-MM-yyyy' format
-                System.out.print("Enter policy EffectiveDate in dd-MM-yyyy format :");
-                String date1 = sc.next();
-                System.out.print("Enter policy ExpirationDate in dd-MM-yyyy format :");
-                String date2 = sc.next();
-                // create SimpleDateFormat object to parse string to java.util.Date format
-                // in constructor provide the required date format. In this case it is 'dd-MM-yyyy'
-                // the string formatted date value should match the provided date format in constructor
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                // parsing string to java.util.Date format
-                java.util.Date utilEffectiveDate = sdf.parse(date1);
-                java.util.Date utilExpirationDate = sdf.parse(date2);
-                // converting java.util.Date to java.sql.Date by passing time value of java.util.Date to java.sql.Date
-                // constructor
-                Date effectiveDate = new Date(utilEffectiveDate.getTime());
-                Date expirationDate = new Date(utilExpirationDate.getTime());
-                // use setDate method to pass the date value to positional parameter of PreparedStatement
-                preparedStatement.setDate(1, effectiveDate);
-                preparedStatement.setDate(2, expirationDate);
-                preparedStatement.executeUpdate();
-                System.out.print("Record inserted successfully");
+            // disabling autocommit to false so that we can manually commit the transaction as we want to read the
+            // ResultSet after committing
+            connection.setAutoCommit(false);
+            // creating Statement object and configuring it with ResultSet constants as close cursor at commit which will
+            // close the Result once the transaction is being committed
+            // This feature is available to limited JDBC drivers and might not work on some of the drivers
+            try(Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.CLOSE_CURSORS_AT_COMMIT)) {
+                ResultSet resultSet = statement.executeQuery(sqlQuery);
+                connection.commit();
+                DisplayResultSet.display(resultSet);
             }
         }
         catch (SQLSyntaxErrorException e) {
             e.printStackTrace();
         }
         catch (SQLException e) {
-            e.printStackTrace();
-        }
-        catch (ParseException e) {
             e.printStackTrace();
         }
     }
