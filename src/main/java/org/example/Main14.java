@@ -282,7 +282,7 @@ public class Main14 {
                 resultSet.updateString(2, firstName);
                 resultSet.updateString(3, lastName);
                 resultSet.updateInt(4, age);
-                // once all the values added to row, insert the record to teh database
+                // once all the values added to row, insert the record to the database
                 resultSet.insertRow();
                 System.out.println("Records after insertion of new record :");
                 resultSet.beforeFirst();

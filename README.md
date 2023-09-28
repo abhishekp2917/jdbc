@@ -66,3 +66,26 @@ CREATE TABLE 'users' (
   PRIMARY KEY ('UserID')
 )
 ```
+
+## City Table 
+
+```sql
+CREATE TABLE 'city' (
+	'ID' int NOT NULL AUTO_INCREMENT,
+    'Name' varchar(20) NOT NULL,
+    PRIMARY KEY ('ID')
+);
+```
+
+## Professor Table
+
+```sql
+CREATE TABLE professor (
+	'ID' int NOT NULL AUTO_INCREMENT,
+    'FirstName' varchar(20) NOT NULL,
+    'LastName' varchar(20) NOT NULL,
+    'City' INT,
+    PRIMARY KEY ('ID'),
+    FOREIGN KEY ('City') REFERENCES city('ID')
+);
+```
