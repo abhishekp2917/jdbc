@@ -1,0 +1,141 @@
+*   What is RowSet ?
+
+>>  RowSet is child interface of ResultSet present in 'javax.sql' package. It is similar to Result for handling
+    records present in DB.
+
+    Unlike ResultSet, it is by default scrollable and Updatable. Moreover, one can access records present in RowSet
+    even after closing the underline DB connection.
+
+    It is serializable unlike ResultSet.
+
+________________________________________________________________________________________________________________________
+
+*   Explain various types of RowSet ?
+
+>>  There are 5 types of RowSet :
+
+    (1) JdbcRowSet :
+
+        -   It is child Interface of RowSet
+
+        -   JdbcRowSet is a connected RowSet that maintains a connection to the database to access records present in it,
+            similar to a ResultSet.
+
+        -   It is by default scrollable and updatable unlike ResultSet
+
+    (2) CachedRowSet :
+
+        -   It is Child Interface of RowSet
+
+        -   CachedRowSet caches data in memory, allowing it to be used without an active database connection. That means
+            one can access records in CachedRowSet even after closing the DB connection.
+
+        -   To reflect the changes made to CachedRowSet into DB, connection must be established else change can't be seen
+            in DB
+
+        -   Similar to all other RowSets, it is also scrollable and updatable by default.
+
+    (3) WebRowSet :
+
+        -   It is child interface of CachedRowSet
+
+        -   WebRowSet is designed to work with XML data, making it suitable for web services and data interchange in
+            XML format. One can write records into XML data out of WebRowSet and can also read the XML data to update
+            the WebRowSet.
+
+    (4) JoinRowSet :
+
+        -   It is child interface of WebRowSet
+
+        -   JoinRowSet allows you to perform SQL JOIN operations on multiple RowSet objects. You can combine data from
+            different sources by joining RowSet instances using SQL-style joins.
+
+    (5) FilteredRowSet :
+
+        -   It is child interface of WebRowSet.
+
+        -   This RowSet provides functionality to filter the records that is fetched from the DB. To apply filter,
+            implement the 'Predicate' interface and apply this implementation class object to FilterRowSet object. After
+            applying the filter, the records that doesn't satisfy the filter logic will be evicted from the FilterRowSet
+
+________________________________________________________________________________________________________________________
+
+*   Explain hierarchy of the RowSets interfaces ?
+
+>>  Find below the hierarchy of the RowSets interfaces.
+
+                                            ResultSet
+                                                ^
+                                                |
+                                              RowSet
+                                                ^
+                         _______________________|_______________________
+                         ^                                             ^
+                         |                                             |
+                   JdbcRowSet                                     CachedRowSet
+                 (Connected RowSet)                             (Disconnected RowSet)
+                                                                       ^
+                                                                       |
+                                                                    WebRowSet
+                                                                       ^
+                                                _______________________|_______________________
+                                                ^                                             ^
+                                                |                                             |
+                                           JoinRowSet                                     FilteredRowSet
+
+________________________________________________________________________________________________________________________
+
+*   How to create different types of RowSet and use it ?
+
+>>  Following are the steps that need to be followed to create various RowSet :
+
+    (1) Get the RowSetFactory object from the RowSetProvider class
+
+        ```
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+        ```
+    (2) From RowSetFactory, create required RowSet type object
+
+        ```
+            JdbcRowSet jdbcRowSet = rowSetFactory.createJdbcRowSet();
+            CachedRowSet cachedRowSet = rowSetFactory.createCachedRowSet();
+            WebRowSet webRowSet = rowSetFactory.createWebRowSet();
+            JoinRowSet joinRowSet = rowSetFactory.createJoinRowSet();
+            FilteredRowSet filteredRowSet = rowSetFactory.createFilteredRowSet();
+        ```
+
+    (3) Configure jdbc connection properties using setter methods
+
+        ```
+            jdbcRowSet.setUrl("jdbc_url");
+            jdbcRowSet.setUsername("jdbc_username");
+            jdbcRowSet.setPassword("jdbc_password");
+        ```
+
+    (4) Set the sql select query and execute it to fetch the records
+
+        ```
+            jdbcRowSet.setCommand("sql_query");
+            jdbcRowSet.execute();
+        ```
+________________________________________________________________________________________________________________________
+
+*   What is the difference between ResultSet and RowSet ?
+
+>>                  ResultSet                                       RowSet
+
+    It is present in java.sql package               |   It is present in javax.sql package
+                                                    |
+    It is connected that means after closing        |   It is disconnected (excluding JdbcRowSet) that means after
+    the underline DB connection, we can't access    |   closing the underline DB connection, we still can access the
+    ResultSet data                                  |   RowSet data
+                                                    |
+    It is non-serializable                          |   It is serializable
+                                                    |
+    It is by default non-scrollable                 |   It is by default scrollable
+                                                    |
+    It is by default read-only                      |   It is by default updatable
+                                                    |
+    It doesn't support event handling               |   It supports event handling
+                                                    |
+________________________________________________________________________________________________________________________

@@ -5,14 +5,9 @@
 package org.example;
 
 import org.example.utils.DisplayResultSet;
-
 import javax.sql.RowSet;
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.JdbcRowSet;
-import javax.sql.rowset.RowSetFactory;
-import javax.sql.rowset.RowSetProvider;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.sql.rowset.*;
+import java.io.*;
 import java.sql.*;
 import java.util.Properties;
 import java.util.Scanner;
@@ -34,17 +29,10 @@ public class Main15 {
             System.out.println("8. Delete record using CachedRowSet");
             System.out.println("9. Select record using WebRowSet");
             System.out.println("10. Insert record using WebRowSet");
-            System.out.println("11. Update record using WebRowSet");
-            System.out.println("12. Delete record using WebRowSet");
-            System.out.println("13. Select record using JoinRowSet");
-            System.out.println("14. Insert record using JoinRowSet");
-            System.out.println("15. Update record using JoinRowSet");
-            System.out.println("16. Delete record using JoinRowSet");
-            System.out.println("17. Select record using FilteredRowSet");
-            System.out.println("18. Insert record using FilteredRowSet");
-            System.out.println("19. Update record using FilteredRowSet");
-            System.out.println("20. Delete record using FilteredRowSet");
-            System.out.println("21. Exit");
+            System.out.println("11. Delete record using WebRowSet");
+            System.out.println("12. Select record using JoinRowSet");
+            System.out.println("13. Select record using FilteredRowSet");
+            System.out.println("14. Exit");
             System.out.println("_________________________________________________\n");
             int choice = sc.nextInt();
             switch (choice) {
@@ -81,6 +69,26 @@ public class Main15 {
                     break;
                 }
                 case 9 : {
+                    selectRecordUsingWebRowSet();
+                    break;
+                }
+                case 10 : {
+                    insertRecordUsingWebRowSet();
+                    break;
+                }
+                case 11 : {
+                    deleteRecordUsingWebRowSet();
+                    break;
+                }
+                case 12 : {
+                    selectRecordUsingJoinRowSet();
+                    break;
+                }
+                case 13 : {
+                    selectRecordUsingFilteredRowSet();
+                    break;
+                }
+                case 14 : {
                     exit = true;
                     break;
                 }
@@ -251,11 +259,11 @@ public class Main15 {
         try {
             Connection connection = getConnection();
             try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-                // using PreparedStatement to execute query cause we want ResultSet object to demonstrate disconnected
+                // using PreparedStatement to execute query because we want ResultSet object to demonstrate disconnected
                 // property of CachedRowSet
                 // to get CachedRowSet, we will use ResultSet data and will populate the data into CachedRowSet
                 ResultSet resultSet = preparedStatement.executeQuery();
-                // getting RowSetFactory object to get implementation class object of JdbcRowSet
+                // getting RowSetFactory object to get implementation class object of CachedRowSet
                 RowSetFactory rowSetFactory = RowSetProvider.newFactory();
                 // getting CachedRowSet implementation class object
                 CachedRowSet cachedRowSet = rowSetFactory.createCachedRowSet();
@@ -286,7 +294,7 @@ public class Main15 {
                 // property of CachedRowSet
                 // to get CachedRowSet, we will use ResultSet data and will populate the data into CachedRowSet
                 ResultSet resultSet = preparedStatement.executeQuery();
-                // getting RowSetFactory object to get implementation class object of JdbcRowSet
+                // getting RowSetFactory object to get implementation class object of CachedRowSet
                 RowSetFactory rowSetFactory = RowSetProvider.newFactory();
                 // getting CachedRowSet implementation class object
                 CachedRowSet cachedRowSet = rowSetFactory.createCachedRowSet();
@@ -348,7 +356,7 @@ public class Main15 {
                 // property of CachedRowSet
                 // to get CachedRowSet, we will use ResultSet data and will populate the data into CachedRowSet
                 ResultSet resultSet = preparedStatement.executeQuery();
-                // getting RowSetFactory object to get implementation class object of JdbcRowSet
+                // getting RowSetFactory object to get implementation class object of CachedRowSet
                 RowSetFactory rowSetFactory = RowSetProvider.newFactory();
                 // getting CachedRowSet implementation class object
                 CachedRowSet cachedRowSet = rowSetFactory.createCachedRowSet();
@@ -409,7 +417,7 @@ public class Main15 {
                 // property of CachedRowSet
                 // to get CachedRowSet, we will use ResultSet data and will populate the data into CachedRowSet
                 ResultSet resultSet = preparedStatement.executeQuery();
-                // getting RowSetFactory object to get implementation class object of JdbcRowSet
+                // getting RowSetFactory object to get implementation class object of CachedRowSet
                 RowSetFactory rowSetFactory = RowSetProvider.newFactory();
                 // getting CachedRowSet implementation class object
                 CachedRowSet cachedRowSet = rowSetFactory.createCachedRowSet();
@@ -441,6 +449,244 @@ public class Main15 {
                 cachedRowSet.beforeFirst();
                 DisplayResultSet.display(cachedRowSet);
             }
+        }
+        catch (SQLSyntaxErrorException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void selectRecordUsingWebRowSet() {
+        String sqlQuery = "SELECT * FROM professor";
+        try {
+            Connection connection = getConnection();
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+                // using PreparedStatement to execute query because we want ResultSet object to demonstrate disconnected
+                // property of WebRowSet
+                // to get WebRowSet, we will use ResultSet data and will populate the data into WebRowSet
+                ResultSet resultSet = preparedStatement.executeQuery();
+                // getting RowSetFactory object to get implementation class object of WebRowSet
+                RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+                // getting WebRowSet implementation class object
+                WebRowSet webRowSet = rowSetFactory.createWebRowSet();
+                // populating ResultSet data into CachedRowSet
+                webRowSet.populate(resultSet);
+                // closing the connection just to showcase that after closing connection we can't access ResultSet but
+                // can access webRowSet as it is disconnected
+                connection.close();
+                // using WebRowSet, we can write the records present in WebRowSet into an XML file
+                // getting XML file name from the user
+                System.out.print("Enter XML file name :");
+                String filePath = String.format("C:\\jdbc\\src\\main\\resources\\%s", sc.next());
+                // using Writer to write the records data to the XML file
+                Writer fileWriter = new FileWriter(filePath);
+                webRowSet.writeXml(fileWriter);
+                System.out.println(String.format("Records written to file '%s' successfully", filePath));
+                // as we used Writer to write records, it made the cursor to point after the last row
+                // moving the cursor to before the first row so that we can print the record from the top
+                webRowSet.beforeFirst();
+                // getting records from WebRowSet after having connection closed
+                DisplayResultSet.display(webRowSet);
+                displayOptionsForScrollableResultSet(webRowSet);
+            }
+        }
+        catch (SQLSyntaxErrorException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void insertRecordUsingWebRowSet() {
+        String sqlQuery = "SELECT * FROM professor";
+        try {
+            Connection connection = getConnection();
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+                // using PreparedStatement to execute query because we want ResultSet object to demonstrate disconnected
+                // property of WebRowSet
+                // to get WebRowSet, we will use ResultSet data and will populate the data into WebRowSet
+                ResultSet resultSet = preparedStatement.executeQuery();
+                // getting RowSetFactory object to get implementation class object of WebRowSet
+                RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+                // getting WebRowSet implementation class object
+                WebRowSet webRowSet = rowSetFactory.createWebRowSet();
+                // populating ResultSet data into CachedRowSet
+                webRowSet.populate(resultSet);
+                // closing the connection just to showcase that after closing connection we can't access ResultSet but
+                // can access webRowSet as it is disconnected
+                connection.close();
+                System.out.println("Records before insertion of new record :");
+                DisplayResultSet.display(webRowSet);
+                // moving the cursor to after last row so that all the new record will be inserted after last row
+                webRowSet.afterLast();
+                // using WebRowSet, we can read the XML file and insert the record into WebRowSet
+                // getting XML file name from the user from which the new record to be inserted
+                // to insert the record, just make the record tag as <insertRow> in XML file
+                System.out.print("Enter XML file name :");
+                String filePath = String.format("C:\\jdbc\\src\\main\\resources\\%s", sc.next());
+                // using reader to read the records data from the XML file
+                Reader fileReader = new FileReader(filePath);
+                webRowSet.readXml(fileReader);
+                System.out.println(String.format("Records read from the file '%s' successfully", filePath));
+                // opening new connection to reflect the changes in DB that was made in WebRowSet
+                connection = getConnection();
+                // disabling Auto Commit cause if it set, we can't manually commit the changes. Since 'acceptChanges'
+                // method manually commit the changes, we have to disable Auto Commit
+                connection.setAutoCommit(false);
+                // pass the Connection object for accepting the changes. This will reflect the changes in DB
+                webRowSet.acceptChanges(connection);
+                System.out.println("Records after insertion of new record :");
+                // as we used Reader to read records, it made the cursor to point after the last row
+                // moving the cursor to before the first row so that we can print the record from the top
+                webRowSet.beforeFirst();
+                // getting records from WebRowSet after having connection closed
+                DisplayResultSet.display(webRowSet);
+            }
+        }
+        catch (SQLSyntaxErrorException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteRecordUsingWebRowSet() {
+        String sqlQuery = "SELECT * FROM professor";
+        try {
+            Connection connection = getConnection();
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+                // using PreparedStatement to execute query because we want ResultSet object to demonstrate disconnected
+                // property of WebRowSet
+                // to get WebRowSet, we will use ResultSet data and will populate the data into WebRowSet
+                ResultSet resultSet = preparedStatement.executeQuery();
+                // getting RowSetFactory object to get implementation class object of WebRowSet
+                RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+                // getting WebRowSet implementation class object
+                WebRowSet webRowSet = rowSetFactory.createWebRowSet();
+                // populating ResultSet data into CachedRowSet
+                webRowSet.populate(resultSet);
+                // closing the connection just to showcase that after closing connection we can't access ResultSet but
+                // can access webRowSet as it is disconnected
+                connection.close();
+                System.out.println("Records before deletion :");
+                DisplayResultSet.display(webRowSet);
+                // moving the cursor to before first row so that the row to be deleted will be found and will be removed
+                webRowSet.beforeFirst();
+                // using WebRowSet, we can read the XML file and delete the record from WebRowSet
+                // getting XML file name from the user from which the record to be deleted
+                // to delete the record, just make the record tag as <deleteRow> in XML file
+                System.out.print("Enter XML file name :");
+                String filePath = String.format("C:\\jdbc\\src\\main\\resources\\%s", sc.next());
+                // using reader to read the records data from the XML file
+                Reader fileReader = new FileReader(filePath);
+                webRowSet.readXml(fileReader);
+                System.out.println(String.format("Records read from the file '%s' successfully", filePath));
+                // opening new connection to reflect the changes in DB that was made in WebRowSet
+                connection = getConnection();
+                // disabling Auto Commit cause if it set, we can't manually commit the changes. Since 'acceptChanges'
+                // method manually commit the changes, we have to disable Auto Commit
+                connection.setAutoCommit(false);
+                // pass the Connection object for accepting the changes. This will reflect the changes in DB
+                webRowSet.acceptChanges(connection);
+                System.out.println("Records after deletion :");
+                // as we used Reader to read records, it made the cursor to point after the last row
+                // moving the cursor to before the first row so that we can print the record from the top
+                webRowSet.beforeFirst();
+                // getting records from WebRowSet after having connection closed
+                DisplayResultSet.display(webRowSet);
+            }
+        }
+        catch (SQLSyntaxErrorException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void selectRecordUsingJoinRowSet() {
+        String professorSqlQuery = "SELECT * FROM professor";
+        String citySqlQuery = "SELECT * FROM city";
+        try {
+            Connection connection = getConnection();
+            // getting RowSetFactory object to get implementation class object of CachedRowSet and JoinRowSet
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            // getting CachedRowSet implementation class object and executing the query to get the professor records
+            CachedRowSet professorCachedRowSet = rowSetFactory.createCachedRowSet();
+            professorCachedRowSet.setCommand(professorSqlQuery);
+            professorCachedRowSet.execute(connection);
+            // getting another CachedRowSet implementation class object and executing the query to get the city records
+            CachedRowSet cityCachedRowSet = rowSetFactory.createCachedRowSet();
+            cityCachedRowSet.setCommand(citySqlQuery);
+            cityCachedRowSet.execute(connection);
+            // getting JoinRowSet implementation class object to join both the CachedRowSet i.e. professor and city
+            JoinRowSet joinRowSet = rowSetFactory.createJoinRowSet();
+            // joining both the CachedRowSet
+            // to join the RowSet, pass the RowSet in first parameter and the reference column index in second parameter
+            // in this case 1st column of 'city' table is being referenced by 4th column of 'professor' table
+            joinRowSet.addRowSet(cityCachedRowSet, 1);
+            joinRowSet.addRowSet(professorCachedRowSet, 4);
+            // using JoinRowSet, we can write the records present in JoinRowSet into an XML file
+            // getting XML file name from the user
+            System.out.print("Enter XML file name :");
+            String filePath = String.format("C:\\jdbc\\src\\main\\resources\\%s", sc.next());
+            // using Writer to write the records data to the XML file
+            Writer fileWriter = new FileWriter(filePath);
+            joinRowSet.writeXml(fileWriter);
+            System.out.println(String.format("Records written to file '%s' successfully", filePath));
+            // as we used Writer to write records, it made the cursor to point after the last row
+            // moving the cursor to before the first row so that we can print the record from the top
+            joinRowSet.beforeFirst();
+            DisplayResultSet.display(joinRowSet);
+            displayOptionsForScrollableResultSet(joinRowSet);
+        }
+        catch (SQLSyntaxErrorException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void selectRecordUsingFilteredRowSet() {
+        String sqlQuery = "SELECT * FROM employee";
+        try {
+            Connection connection = getConnection();
+            // getting RowSetFactory object to get implementation class object of WebRowSet
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            // getting FilteredRowSet implementation class object and executing the query to get the employee records
+            FilteredRowSet filteredRowSet = rowSetFactory.createFilteredRowSet();
+            filteredRowSet.setCommand(sqlQuery);
+            filteredRowSet.execute(connection);
+            // closing the connection just to showcase that after closing connection we can't access ResultSet but
+            // can access webRowSet as it is disconnected
+            connection.close();
+            System.out.println("Records before applying filter :");
+            DisplayResultSet.display(filteredRowSet);
+            // creating custom filter object which will filter out the employee records once applied to FilteredRowSet
+            EmployeeFilter employeeFilter = new EmployeeFilter();
+            // applying filter to FilteredRowSet
+            filteredRowSet.setFilter(employeeFilter);
+            filteredRowSet.beforeFirst();
+            System.out.println("Records after applying filter :");
+            DisplayResultSet.display(filteredRowSet);
+            displayOptionsForScrollableResultSet(filteredRowSet);
         }
         catch (SQLSyntaxErrorException e) {
             e.printStackTrace();
@@ -607,5 +853,51 @@ public class Main15 {
                 }
             }
         }
+    }
+}
+
+
+// creating implementation class of Predicate class which will provide implementation of filter
+class EmployeeFilter implements Predicate {
+    // providing logic of filter which will return true only when 'Salary' of an employee is between 10k and 50k inclusive
+    // if this method returns true, then that RowSet record will be included after filtering else not
+    // on setting filter to FilteredRowSet, this evaluate(RowSet) method will be called to check the condition
+    // the other two method are very rarely used one
+    @Override
+    public boolean evaluate(RowSet rowSet) {
+        boolean result = false;
+        try {
+            FilteredRowSet filteredRowSet = (FilteredRowSet) rowSet;
+            float salary = filteredRowSet.getFloat("Salary");
+            if(salary>=10000 && salary<=50000) result = true;
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    // in this method, it will evaluate based on column number and will return true of false
+    @Override
+    public boolean evaluate(Object value, int column) {
+        if (column==4) {
+            float salary = (Float) value;
+            if (salary >= 10000 && salary <= 50000) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // in this method, it will evaluate based on column name and will return true of false
+    @Override
+    public boolean evaluate(Object value, String columnName)  {
+        if (columnName.equalsIgnoreCase("salary")) {
+            float salary = (Float) value;
+            if (salary >= 10000 && salary <= 50000) {
+                return true;
+            }
+        }
+        return false;
     }
 }
