@@ -346,3 +346,32 @@ ________________________________________________________________________________
         ```
 ________________________________________________________________________________________________________________________
 
+*   What is RowId ?
+
+>>  A RowId is a unique identifier associated with a specific row or record in a database table. It is a mechanism used
+    by some database systems to uniquely identify and reference rows within a table. The exact implementation and
+    characteristics of RowId can vary depending on the DBMS being used.
+
+    It's important to note that not all database systems use the concept of RowId. Some databases, like MySQL and
+    PostgreSQL, primarily use auto-incremented integer values or other primary key mechanisms. On the other hand,
+    databases like Oracle have a concept of RowId, which is an internal identifier for each row.
+
+________________________________________________________________________________________________________________________
+
+*   How to know LifeTime of RowId or to check if the DBMS supports RowId ?
+
+>>  Follow below steps to get LifeTime of RowId of a particular DBMS :
+
+    (1) Get the DatabaseMetaData from the underline connection :
+
+        ```
+            Connection connection = DriverManager.getConnection("url", "username", "password");
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+        ```
+
+    (2) From the DatabaseMetaData, get the RowId lifeTime :
+
+        ```
+            RowIdLifetime lifeTime = databaseMetaData.getRowIdLifetime();
+        ```
+________________________________________________________________________________________________________________________
