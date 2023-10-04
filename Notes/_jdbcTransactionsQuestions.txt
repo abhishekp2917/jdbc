@@ -1,0 +1,202 @@
+*   What are various types of transaction ?
+
+>>  Based on scope of transaction, transactions are of 2 types :
+
+    (1) Local Transactions:
+
+        -   Scope: Local transactions are confined to a single database or resource. They involve operations on a single
+            database or resource, and all the database operations within the transaction are treated as a single unit of
+            work.
+
+        -   Atomicity: In a local transaction, the ACID properties (Atomicity, Consistency, Isolation, Durability) apply
+            within the boundaries of the single database or resource. Either all the operations within the transaction
+            are committed, or none of them are.
+
+        -   Example: Suppose you have a single database, and you perform a series of SQL statements within a single
+            database connection. This constitutes a local transaction.
+
+    (2) Global Transactions (Distributed Transactions):
+
+        -   Scope: Global transactions span multiple databases or resources that may be distributed across different
+            systems or servers. They involve operations that affect data consistency across multiple databases or
+            resources, and all participating resources must agree on the outcome of the transaction.
+
+        -   Coordination: Global transactions require coordination among distributed resources. This coordination ensures
+            that either all resources commit their changes, or all resources roll back their changes if any part of the
+            transaction fails.
+
+        -   Atomicity: The ACID properties also apply to global transactions but at a higher level. The entire global
+            transaction is treated as an atomic unit of work, ensuring that all participating resources are in a
+            consistent state.
+
+        -   Example: In a distributed application, you may need to perform updates on multiple databases within a single
+            transaction. For example, transferring funds from one bank account to another involves updating the balances
+            in both the sender's and receiver's accounts, which may reside on different database servers. Coordinating
+            this transfer across databases constitutes a global transaction.
+
+    Global transactions are more complex to manage than local transactions because they involve coordination,
+    synchronization, and two-phase commit protocols to ensure data consistency across distributed resources.
+
+________________________________________________________________________________________________________________________
+
+*   What is Savepoint in JDBC ?
+
+>>  Savepoint is a named point within a database transaction to which you can roll back if needed. Savepoints allow you
+    to create intermediate points within a transaction so that you can later roll back to a specific point within the
+    transaction, rather than rolling back the entire transaction.
+
+    You can create a savepoint within a transaction using the setSavepoint method on a Connection object.
+
+    ```
+        // Disable auto-commit to start a transaction
+        connection.setAutoCommit(false);
+        Savepoint savepoint = connection.setSavepoint("mySavepoint");
+    ```
+
+    If a part of your transaction encounters an error or you want to undo changes made after a specific savepoint, you
+    can use the rollback method to roll back to that savepoint. When you roll back to a savepoint, all changes made after
+    the savepoint are undone, and the transaction continues from that point.
+
+    ```
+        // Perform database operations
+        // If an error occurs, you can roll back to the savepoint
+        connection.rollback(savepoint);
+    ```
+
+    Savepoints can also be released using the releaseSavepoint method on the Connection object. Releasing a savepoint
+    indicates that you no longer need it, and it frees up resources associated with the savepoint.
+
+    ```
+        connection.releaseSavepoint(savepoint);
+    ```
+________________________________________________________________________________________________________________________
+
+*   List out various transaction concurrency problems.
+
+>>  Transaction concurrency in a database system can lead to several problems when multiple transactions execute
+    concurrently. These problems can impact data consistency and integrity. Here are various transaction concurrency
+    problems:
+
+    (1) Dirty Read: A dirty read occurs when one transaction reads data that has been modified by another uncommitted
+        transaction. If the second transaction is rolled back, the data read by the first transaction becomes invalid.
+
+    (2) Non-Repeatable Read: A non-repeatable read occurs when a transaction reads the same data multiple times within
+        its execution, but the data changes between reads due to another transaction's updates. This can lead to
+        inconsistency in the data.
+
+    (3) Phantom Read: A phantom read happens when a transaction reads a set of rows that satisfy a condition, but
+        another transaction inserts, updates, or deletes rows that also meet the condition, causing the first
+        transaction's subsequent read to include different rows.
+
+    (4) Lost Update: A lost update occurs when two or more transactions read the same data concurrently and then update
+        it. Only one transaction's update is saved, potentially leading to data loss.
+
+    (5) Concurrency Anomalies: These anomalies include problems like write skew, where multiple transactions attempt to
+        update overlapping data, and read-modify-write anomalies, where a read operation is followed by a modify
+        operation, leading to inconsistencies.
+
+    (6) Deadlock: A deadlock occurs when two or more transactions are waiting for each other to release locks on
+        resources. This results in a standstill, where no transaction can proceed, and intervention is needed to break
+        the deadlock.
+
+    (7) Starvation: Starvation happens when a transaction is repeatedly delayed or prevented from executing due to other
+        transactions monopolizing resources. Some transactions may never complete if they consistently face resource
+        contention.
+
+    (8) Inconsistent Retrieval: Inconsistent retrieval occurs when a transaction reads data from multiple tables or
+        sources, and some sources reflect changes made by other transactions while others do not, leading to an
+        inconsistent view of the data.
+
+    (9) Data Corruption: Concurrent updates to data can lead to data corruption if proper locking and synchronization
+        mechanisms are not in place. Data integrity can be compromised when transactions interfere with each other.
+
+    (10) Race Conditions: Race conditions occur when the outcome of a program depends on the relative timing of
+         operations in concurrent threads or processes. These conditions can lead to unpredictable and undesirable
+         behavior.
+
+    (11) Rollback and Retry: If a transaction encounters a concurrency problem, it may need to be rolled back and
+         retried. This can result in additional overhead and may impact performance.
+
+    To mitigate these concurrency problems, database management systems provide various isolation levels and concurrency
+    control mechanisms, such as locking, timestamp-based ordering, and optimistic concurrency control.
+
+________________________________________________________________________________________________________________________
+
+*   What are isolation levels ?
+
+>>  Isolation levels are a concept in database management systems (DBMS) that define how transactions interact with each
+    other in a multi-user database environment. These levels determine the degree of isolation and data consistency
+    provided to concurrent transactions. Isolation levels help manage the trade-off between data consistency and system
+    performance in database systems.
+
+________________________________________________________________________________________________________________________
+
+*   What are various levels of isolations in JDBC and how to set it?
+
+>>  In JDBC, there are four standard transaction isolation levels that you can set for your transactions. Here's an
+    explanation of each JDBC isolation level:
+
+    (1) READ UNCOMMITTED:
+
+        -   Description: In the "READ UNCOMMITTED" isolation level, a transaction can read uncommitted changes made by
+            other transactions. It offers the highest degree of concurrency but provides the lowest level of data
+            consistency.
+
+        -   Issues: This level can lead to dirty reads, non-repeatable reads, and phantom reads.
+
+        -   Use Cases: This isolation level is rarely used in practice due to its low data consistency and potential
+            issues.
+
+        ```
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+        ```
+
+    (2) READ COMMITTED:
+
+        -   Description: In the "READ COMMITTED" isolation level, a transaction can only read committed data. It ensures
+            that data read by one transaction is not changed by other transactions before it is committed. This way it
+            solves Dirty read problem
+
+        -   Issues: It can still result in non-repeatable reads and phantom reads.
+
+        -   Use Cases: This is the default isolation level for many database systems and is suitable for most scenarios
+            where data consistency is important.
+
+        ```
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+        ```
+
+    (3) REPEATABLE READ:
+
+        -   Description: In the "REPEATABLE READ" isolation level, a transaction can read the same data multiple times
+            within its own scope, and the data won't change due to other transactions. It prevents non-repeatable reads.
+            Other transactions can modify the table, but they won't affect the result of the SELECT query performed
+            within this transaction.
+
+        -   Issues: As changes made by other transaction won't reflect in result of the SELECT query performed, some data
+            might appear or disappear as Phantom resulting in phantom reads.
+
+        -   Use Cases: This level is appropriate when you want to ensure that data read by a transaction remains stable
+            during the transaction's lifetime.
+
+        ```
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+        ```
+
+    (4) SERIALIZABLE:
+
+        -   Description: The "SERIALIZABLE" isolation level is the most restrictive. It ensures complete isolation
+            between transactions. No concurrent transaction can modify or access data being used by another transaction
+            until the first transaction is completed. This level prevents all concurrency-related issues but can impact
+            system performance due to reduced concurrency.
+
+        -   Issues: While it offers the highest data consistency, it can lead to performance bottlenecks in systems
+            with high concurrency.
+
+        -   Use Cases: Use this level when data integrity and consistency are critical, and you can tolerate reduced
+            concurrency.
+
+        ```
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        ```
+________________________________________________________________________________________________________________________
